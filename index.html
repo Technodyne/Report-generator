@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <title>Construction Snag Tracker</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --action-color: #2980b9;
+            --border-color: #bdc3c7;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--action-color);
+            padding-bottom: 10px;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: var(--secondary-color);
+        }
+
+        input[type="text"], input[type="date"], select, textarea, input[type="file"] {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background-color: var(--action-color);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background 0.3s;
+            text-align: center;
+        }
+
+        .btn:hover { background-color: #21618c; }
+        .btn-danger { background-color: #e74c3c; }
+        .btn-danger:hover { background-color: #c0392b; }
+        .btn-success { background-color: #27ae60; }
+        .btn-success:hover { background-color: #2ecc71; }
+        .btn-edit { background-color: #f39c12; }
+        .btn-edit:hover { background-color: #d68910; }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #eef2f5;
+            border-radius: 8px;
+        }
+
+        #report-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* --- DASHBOARD STYLES --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .dash-card {
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            border: 1px solid #eee;
+        }
+        .dash-total { background: #eef2f5; color: #2c3e50; grid-column: 1; grid-row: 1; }
+        .dash-prog { background: #fdf2e9; color: #d35400; grid-column: 2; grid-row: 1; }
+        .dash-open { background: #fdedec; color: #c0392b; grid-column: 1; grid-row: 2; }
+        .dash-closed { background: #eafaf1; color: #27ae60; grid-column: 2; grid-row: 2; }
+
+        .snag-item {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            page-break-inside: avoid !important;
+        }
+
+        .snag-photo-wrapper {
+            width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+            background: #fdfdfd;
+            flex-shrink: 0;
+        }
+
+        .snag-photo {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .snag-details {
+            padding: 12px 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9em;
+        }
+
+        .snag-details p {
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+
+        .snag-id {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .status-badge {
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .delete-btn-container {
+            margin-top: auto;
+            text-align: right;
+            padding-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .delete-btn-container .btn {
+            padding: 5px 10px;
+            font-size: 0.85em;
+        }
+
+        /* Styles for Image Markup/Edit Area */
+        #markup-container { display: none; margin-bottom: 15px; width: 100%; }
+        #cropper-wrapper { height: 400px; background: #333; margin-bottom: 10px; }
+        #markup-canvas { border: 2px solid var(--action-color); border-radius: 4px; max-width: 100%; touch-action: none; cursor: crosshair; background-color: #eee; }
+        .edit-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
+        .edit-toolbar .btn { padding: 8px 12px; font-size: 0.9em; flex-grow: 1; }
+
+        .no-screen { display: none !important; }
+        .no-print { display: block; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; }
+            .btn { width: 100%; padding: 15px; }
+            .snag-item { flex-direction: column; }
+            .snag-photo-wrapper { width: 100%; height: 180px; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .report-header { flex-direction: column; gap: 5px; }
+            .dashboard { display: flex; flex-direction: column; }
+            #cropper-wrapper { height: 300px; }
+        }
+
+        /* --- PDF EXPORT RULES --- */
+        .pdf-export-mode {
+            width: 760px !important;   
+            max-width: none !important;
+            padding: 0 10px !important;  
+            margin: 0 auto !important;
+            background-color: #fff !important;
+            box-sizing: border-box !important;
+        }
+
+        .pdf-export-mode .dashboard {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            width: 350px !important; 
+            gap: 10px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .pdf-export-mode .dash-card {
+            font-size: 12px !important;
+            padding: 10px !important;
+        }
+        
+        .pdf-export-mode .no-screen { display: block !important; }
+        
+        .pdf-export-mode .snag-item {
+            display: flex !important;
+            flex-direction: row !important;
+            page-break-inside: avoid !important;
+            margin-bottom: 15px !important;
+            border: none !important;
+            outline: 1px solid #bdc3c7 !important; 
+            border-radius: 4px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            height: auto !important; 
+        }
+        
+        .pdf-export-mode .snag-photo-wrapper {
+            width: 200px !important; 
+            min-width: 200px !important;
+            max-width: 200px !important;
+            border-right: 1px solid #bdc3c7 !important; 
+            border-bottom: none !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .pdf-export-mode .snag-details {
+            padding: 15px !important;
+            font-size: 12px !important; 
+            width: calc(100% - 200px) !important; 
+            box-sizing: border-box !important;
+            word-wrap: break-word !important; 
+        }
+        
+        .pdf-export-mode .snag-id {
+            font-size: 14px !important;
+            margin-bottom: 6px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .pdf-export-mode .report-header {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            width: 100% !important; 
+            margin-bottom: 15px !important;
+            padding-bottom: 10px !important;
+            font-size: 14px !important;
+            text-align: left !important;
+            box-sizing: border-box !important;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Construction Snag Tracker</h2>
+
+    <div class="toolbar no-print">
+        <button class="btn btn-success" onclick="saveData()">💾 Save Project</button>
+        <input type="file" id="load-file" style="display: none;" accept=".json" onchange="loadData(event)">
+        <button class="btn btn-success" onclick="document.getElementById('load-file').click()">📂 Load Project</button>
+        <button class="btn" onclick="exportPDF()">📄 Export to PDF</button>
+        <button class="btn" onclick="exportExcel()">📊 Export to Excel</button>
+    </div>
+
+    <div class="panel no-print">
+        <div class="grid-4" style="margin-bottom: 15px;">
+            <div class="form-group">
+                <label>Report Title</label>
+                <input type="text" id="report-title" placeholder="e.g., Defect Liability Report" oninput="updateReportHeader()">
+            </div>
+            <div class="form-group">
+                <label>Project Name</label>
+                <input type="text" id="proj-name" placeholder="e.g., Tower B Fit-out" oninput="updateReportHeader()">
+            </div>
+            <div class="form-group">
+                <label>Inspection Date</label>
+                <input type="date" id="proj-date" oninput="updateReportHeader()">
+            </div>
+            <div class="form-group">
+                <label>Project Manager</label>
+                <input type="text" id="proj-manager" placeholder="Name" oninput="updateReportHeader()">
+            </div>
+        </div>
+        <div class="grid-4" style="border-top: 1px solid #eee; padding-top: 15px;">
+            <div class="form-group">
+                <label>Snag Prefix (ID)</label>
+                <input type="text" id="report-prefix" value="ADCOOP-SN" oninput="updateReportHeader()">
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Logo Image URL</label>
+                <input type="text" id="report-logo" value="https://logo.clearbit.com/adcoop.com" oninput="updateReportHeader()">
+            </div>
+        </div>
+    </div>
+
+    <div class="panel no-print">
+        <div class="grid-5" style="margin-bottom: 15px;">
+            <div class="form-group">
+                <label>Location / Area</label>
+                <input type="text" id="snag-location" placeholder="e.g., Level 2 - Elec Room">
+            </div>
+            <div class="form-group">
+                <label>Responsible Party</label>
+                <input type="text" id="snag-owner" placeholder="e.g., HVAC Contractor">
+            </div>
+            <div class="form-group">
+                <label>Due Date</label>
+                <input type="date" id="snag-due">
+            </div>
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="snag-priority">
+                    <option value="High">High</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="snag-status">
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div id="drop-zone" style="border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 4px; margin-bottom: 10px; background-color: #fdfdfd; transition: all 0.3s ease;">
+                <label style="cursor: pointer; display: block; width: 100%; height: 100%; margin: 0;">
+                    <span style="font-size: 1.2em; display: block; margin-bottom: 8px; color: var(--primary-color);">📁 Drag & Drop Photo Here</span>
+                    <span style="font-size: 0.9em; color: var(--secondary-color);">or click to browse (Optional)</span>
+                    <input type="file" id="snag-photo" accept="image/*" style="display: none;">
+                </label>
+            </div>
+            
+            <button class="btn" id="btn-markup" style="display: none; margin-bottom: 15px; width: 200px; background-color: #8e44ad;" onclick="showEditor()">✏️ Edit & Markup Photo</button>
+            
+            <div id="markup-container">
+                <div id="cropper-stage">
+                    <div class="edit-toolbar">
+                        <button class="btn" onclick="rotateImage(-90)">🔄 Rotate Left</button>
+                        <button class="btn" onclick="rotateImage(90)">🔄 Rotate Right</button>
+                        <button class="btn btn-success" onclick="applyEditsAndSwitchToDraw()">✅ Apply Edits & Draw</button>
+                    </div>
+                    <div id="cropper-wrapper">
+                        <img id="image-to-edit" style="max-width: 100%; display: block;">
+                    </div>
+                </div>
+                <div id="drawing-stage" style="display: none;">
+                    <label>Draw on photo to highlight defect (Red Ink):</label>
+                    <canvas id="markup-canvas"></canvas>
+                    <button class="btn btn-danger" style="margin-top: 5px; padding: 8px; width: auto;" onclick="undoDrawing()">Undo Last Stroke</button>
+                </div>
+            </div>
+
+            <textarea id="snag-comment" placeholder="Describe the defect and required action..." style="margin-top: 10px;"></textarea>
+            <button class="btn" id="btn-add-snag" style="margin-top: 15px;" onclick="addSnag()">+ Add Snag</button>
+        </div>
+    </div>
+
+    <div class="panel no-print" style="display: flex; gap: 10px; align-items: center; background: #eef2f5; padding: 10px 20px;">
+        <strong style="white-space: nowrap;">🔍 Filter:</strong>
+        <input type="text" id="filter-text" placeholder="Search location, desc..." oninput="renderSnags()" style="flex: 1; padding: 8px;">
+        <select id="filter-status-view" onchange="renderSnags()" style="width: auto; padding: 8px;">
+            <option value="All">All Statuses</option>
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Closed">Closed</option>
+        </select>
+        <select id="filter-priority-view" onchange="renderSnags()" style="width: auto; padding: 8px;">
+            <option value="All">All Priorities</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+        </select>
+    </div>
+
+    <div id="report-container">
+        <div id="pdf-header-wrapper">
+            <h3 id="display-report-title" class="sync-report-title" style="text-align: center; margin-top: 0; color: var(--primary-color);"></h3>
+            
+            <div class="report-header">
+                <div>
+                    <strong style="font-size: 1.2em;" class="sync-proj-name">Project: [Not Set]</strong><br>
+                    <span class="sync-proj-manager">PM: [Not Set]</span><br>
+                    <strong class="sync-proj-date">Date: [Not Set]</strong>
+                </div>
+                <div style="text-align: right;">
+                    <img id="display-report-logo" src="https://logo.clearbit.com/adcoop.com" alt="Company Logo" style="max-height: 50px; max-width: 150px; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="dash-card dash-total">Total Snags: <span id="dash-total-val">0</span></div>
+            <div class="dash-card dash-prog">In Progress: <span id="dash-prog-val">0</span></div>
+            <div class="dash-card dash-open">Open: <span id="dash-open-val">0</span></div>
+            <div class="dash-card dash-closed">Closed: <span id="dash-closed-val">0</span></div>
+        </div>
+
+        <div id="snag-list"></div>
+    </div>
+
+    <script>
+        let snagData = [];
+        let snagCounter = 1;
+        let editingSnagId = null;
+        let hasUnsavedChanges = false; 
+        let currentRawImage = null; 
+        
+        let cropper = null;
+        const imageToEdit = document.getElementById('image-to-edit');
+        const canvas = document.getElementById('markup-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let drawingBaseImage = new Image(); 
+        
+        // True Undo Stack
+        let undoStack = [];
+
+        window.addEventListener('beforeunload', function (e) {
+            if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'Unsaved changes.'; }
+        });
+
+        // XSS Vulnerability Fix
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // --- DRAG AND DROP UI LOGIC ---
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--action-color)';
+            dropZone.style.backgroundColor = '#eef2f5';
+        });
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-color)';
+            dropZone.style.backgroundColor = '#fdfdfd';
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-color)';
+            dropZone.style.backgroundColor = '#fdfdfd';
+            if (e.dataTransfer.files.length > 0) {
+                document.getElementById('snag-photo').files = e.dataTransfer.files;
+                document.getElementById('snag-photo').dispatchEvent(new Event('change'));
+            }
+        });
+
+        document.getElementById('snag-photo').addEventListener('change', function(e) {
+            if (e.target.files.length === 0) {
+                resetEditorUI();
+                return;
+            }
+            const file = e.target.files[0];
+            const objectUrl = URL.createObjectURL(file); 
+            let img = new Image();
+            img.onload = function() {
+                let tempCanvas = document.createElement('canvas');
+                let tempCtx = tempCanvas.getContext('2d');
+                let MAX_DIMENSION = 1200;
+                let scale = Math.min(MAX_DIMENSION / img.width, MAX_DIMENSION / img.height, 1);
+                
+                tempCanvas.width = img.width * scale;
+                tempCanvas.height = img.height * scale;
+                
+                tempCtx.imageSmoothingEnabled = true;
+                tempCtx.imageSmoothingQuality = 'high';
+                tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+                currentRawImage = tempCanvas.toDataURL('image/jpeg', 0.85); 
+                
+                document.getElementById('btn-markup').style.display = 'inline-block'; 
+                document.getElementById('markup-container').style.display = 'none'; 
+                URL.revokeObjectURL(objectUrl);
+            };
+            img.src = objectUrl;
+        });
+
+        function showEditor() {
+            if (!currentRawImage) return;
+            document.getElementById('markup-container').style.display = 'block';
+            document.getElementById('cropper-stage').style.display = 'block';
+            document.getElementById('drawing-stage').style.display = 'none';
+            document.getElementById('btn-markup').style.display = 'none';
+
+            imageToEdit.src = currentRawImage;
+            imageToEdit.onload = function() {
+                if (cropper) { cropper.destroy(); }
+                cropper = new Cropper(imageToEdit, {
+                    viewMode: 1, dragMode: 'move', autoCropArea: 1,
+                    restore: false, guides: false, center: false, highlight: false,
+                    cropBoxMovable: true, cropBoxResizable: true, toggleDragModeOnDblclick: false,
+                });
+            };
+        }
+
+        function rotateImage(deg) { if (cropper) cropper.rotate(deg); }
+
+        function applyEditsAndSwitchToDraw() {
+            if (!cropper) return;
+            const editedImageResult = cropper.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 }).toDataURL('image/jpeg', 0.85);
+            document.getElementById('cropper-stage').style.display = 'none';
+            document.getElementById('drawing-stage').style.display = 'block';
+
+            drawingBaseImage.onload = function() {
+                const containerWidth = document.getElementById('markup-container').clientWidth;
+                const scale = Math.min(containerWidth / drawingBaseImage.width, 1);
+                canvas.width = drawingBaseImage.width * scale;
+                canvas.height = drawingBaseImage.height * scale;
+                ctx.drawImage(drawingBaseImage, 0, 0, canvas.width, canvas.height);
+                cropper.destroy(); cropper = null;
+                undoStack = []; // Reset undo stack on new image
+            }
+            drawingBaseImage.src = editedImageResult;
+        }
+
+        // True Undo Implementation
+        function undoDrawing() {
+            if (undoStack.length > 0) {
+                let lastState = undoStack.pop();
+                let img = new Image();
+                img.onload = function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                }
+                img.src = lastState;
+            } else {
+                clearCanvas(); 
+            }
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(drawingBaseImage, 0, 0, canvas.width, canvas.height);
+            undoStack = [];
+        }
+
+        function getPos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+            const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+        }
+
+        function startDrawing(e) { 
+            isDrawing = true; 
+            undoStack.push(canvas.toDataURL('image/jpeg', 1.0)); // Save pre-stroke state
+            draw(e); 
+        }
+        function stopDrawing() { isDrawing = false; ctx.beginPath(); }
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault(); 
+            const pos = getPos(e);
+            ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.strokeStyle = '#e74c3c'; 
+            ctx.lineTo(pos.x, pos.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+        }
+
+        canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseout', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing, { passive: false });
+        canvas.addEventListener('touchend', stopDrawing); canvas.addEventListener('touchmove', draw, { passive: false });
+
+        function resetEditorUI() {
+             currentRawImage = null;
+             document.getElementById('btn-markup').style.display = 'none';
+             document.getElementById('markup-container').style.display = 'none';
+             document.getElementById('snag-photo').value = '';
+             undoStack = [];
+             if(cropper) { cropper.destroy(); cropper = null; }
+        }
+
+        function updateReportHeader() {
+            let rawDate = document.getElementById('proj-date').value;
+            let formattedDate = rawDate;
+            if (rawDate) {
+                const parts = rawDate.split('-');
+                if (parts.length === 3) formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            
+            const titleStr = document.getElementById('report-title').value;
+            const pNameStr = 'Project: ' + (document.getElementById('proj-name').value || '[Not Set]');
+            const pMgrStr = 'PM: ' + (document.getElementById('proj-manager').value || '[Not Set]');
+            const pDateStr = 'Date: ' + (formattedDate || '[Not Set]');
+            const logoUrl = document.getElementById('report-logo').value || 'https://logo.clearbit.com/adcoop.com';
+
+            document.querySelectorAll('.sync-report-title').forEach(el => el.innerText = titleStr);
+            document.querySelectorAll('.sync-proj-name').forEach(el => el.innerText = pNameStr);
+            document.querySelectorAll('.sync-proj-manager').forEach(el => el.innerText = pMgrStr);
+            document.querySelectorAll('.sync-proj-date').forEach(el => el.innerText = pDateStr);
+            
+            const displayLogo = document.getElementById('display-report-logo');
+            if (displayLogo) displayLogo.src = logoUrl;
+            
+            hasUnsavedChanges = true;
+        }
+
+        function updateDashboard() {
+            const total = snagData.length;
+            const open = snagData.filter(s => s.status === 'Open').length;
+            const prog = snagData.filter(s => s.status === 'In Progress').length;
+            const closed = snagData.filter(s => s.status === 'Closed').length;
+
+            document.getElementById('dash-total-val').innerText = total;
+            document.getElementById('dash-open-val').innerText = open;
+            document.getElementById('dash-prog-val').innerText = prog;
+            document.getElementById('dash-closed-val').innerText = closed;
+        }
+
+        function addSnag() {
+            const commentInput = document.getElementById('snag-comment');
+            const locInput = document.getElementById('snag-location');
+            const ownerInput = document.getElementById('snag-owner');
+            const dueInput = document.getElementById('snag-due');
+            const priorityInput = document.getElementById('snag-priority');
+            const statusInput = document.getElementById('snag-status');
+
+            // Bug Fix: Validation
+            if (!commentInput.value.trim() && !locInput.value.trim() && !currentRawImage) {
+                alert("Please provide at least a location, description, or photo to create a snag.");
+                return;
+            }
+
+            let finalImageToSave = null; 
+
+            if (currentRawImage) {
+                if (document.getElementById('markup-container').style.display === 'block') {
+                     if(document.getElementById('drawing-stage').style.display === 'block') {
+                         finalImageToSave = canvas.toDataURL('image/jpeg', 0.85);
+                     } else {
+                         alert("Please click 'Apply Edits & Draw' before adding the snag."); return;
+                     }
+                } else { 
+                     finalImageToSave = currentRawImage; 
+                }
+            }
+            
+            if (editingSnagId !== null) {
+                // Update Existing
+                const indexToUpdate = editingSnagId - 1;
+                snagData[indexToUpdate].image = finalImageToSave;
+                snagData[indexToUpdate].comment = commentInput.value;
+                snagData[indexToUpdate].location = locInput.value;
+                snagData[indexToUpdate].owner = ownerInput.value;
+                snagData[indexToUpdate].due = dueInput.value;
+                snagData[indexToUpdate].priority = priorityInput.value;
+                snagData[indexToUpdate].status = statusInput.value;
+                
+                editingSnagId = null;
+                document.getElementById('btn-add-snag').innerText = '+ Add Snag';
+            } else {
+                // Add New
+                snagData.push({ 
+                    id: snagCounter++, 
+                    image: finalImageToSave, 
+                    comment: commentInput.value,
+                    location: locInput.value,
+                    owner: ownerInput.value,
+                    due: dueInput.value,
+                    priority: priorityInput.value,
+                    status: statusInput.value
+                });
+            }
+
+            resetEditorUI(); 
+            commentInput.value = '';
+            locInput.value = '';
+            ownerInput.value = '';
+            dueInput.value = '';
+            priorityInput.value = 'Medium';
+            statusInput.value = 'Open';
+
+            hasUnsavedChanges = true; 
+            renderSnags();
+        }
+
+        // Bug Fix: Edit Existing Snag
+        function editSnag(id) {
+            const index = id - 1;
+            const snag = snagData[index];
+            document.getElementById('snag-location').value = snag.location || '';
+            document.getElementById('snag-owner').value = snag.owner || '';
+            document.getElementById('snag-due').value = snag.due || '';
+            document.getElementById('snag-status').value = snag.status || 'Open';
+            document.getElementById('snag-priority').value = snag.priority || 'Medium';
+            document.getElementById('snag-comment').value = snag.comment || '';
+            
+            if (snag.image) {
+                currentRawImage = snag.image;
+                document.getElementById('markup-container').style.display = 'block';
+                document.getElementById('cropper-stage').style.display = 'block';
+                document.getElementById('drawing-stage').style.display = 'none';
+                document.getElementById('btn-markup').style.display = 'none';
+                
+                imageToEdit.src = currentRawImage;
+                imageToEdit.onload = function() {
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(imageToEdit, {
+                        viewMode: 1, dragMode: 'move', autoCropArea: 1,
+                        restore: false, guides: false, center: false, highlight: false,
+                        cropBoxMovable: true, cropBoxResizable: true, toggleDragModeOnDblclick: false,
+                    });
+                };
+            } else {
+                resetEditorUI();
+            }
+            
+            editingSnagId = id;
+            document.getElementById('btn-add-snag').innerText = '💾 Update Snag';
+            window.scrollTo(0, document.querySelector('.panel.no-print').offsetTop);
+        }
+
+        function updateSnagStatus(id, newStatus) {
+            snagData[id - 1].status = newStatus;
+            hasUnsavedChanges = true;
+            renderSnags(); 
+        }
+
+        // Bug Fix: No gaps in IDs upon deletion
+        function deleteSnag(id) { 
+            snagData.splice(id - 1, 1); 
+            snagData.forEach((snag, i) => { snag.id = i + 1; });
+            snagCounter = snagData.length + 1;
+            hasUnsavedChanges = true; 
+            renderSnags(); 
+        }
+
+        function renderSnags() {
+            const listContainer = document.getElementById('snag-list');
+            const prefix = document.getElementById('report-prefix').value || 'ADCOOP-SN';
+            
+            // Search Filters
+            const filterText = document.getElementById('filter-text').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status-view').value;
+            const filterPriority = document.getElementById('filter-priority-view').value;
+
+            let batchedHTML = ''; 
+            
+            snagData.forEach((snag) => {
+                // Apply Filters
+                if (filterStatus !== 'All' && snag.status !== filterStatus) return;
+                if (filterPriority !== 'All' && snag.priority !== filterPriority) return;
+                if (filterText) {
+                    const searchStr = `${snag.location || ''} ${snag.owner || ''} ${snag.comment || ''}`.toLowerCase();
+                    if (!searchStr.includes(filterText)) return;
+                }
+
+                let imageContent = snag.image 
+                    ? `<img src="${snag.image}" alt="Snag Photo" class="snag-photo">` 
+                    : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #95a5a6; font-weight: bold; font-size: 14px; text-align: center; padding: 10px;">NO IMAGE</div>`;
+
+                let badgeColor = "#e74c3c"; // Red
+                if (snag.status === "In Progress") badgeColor = "#e67e22"; // Orange
+                if (snag.status === "Closed") badgeColor = "#27ae60"; // Green
+
+                let prioColor = "#95a5a6";
+                if (snag.priority === "High") prioColor = "#c0392b";
+                if (snag.priority === "Medium") prioColor = "#f39c12";
+                if (snag.priority === "Low") prioColor = "#27ae60";
+                
+                // Overdue logic
+                let overdueHTML = "";
+                if (snag.due && snag.status !== "Closed") {
+                    const dueDate = new Date(snag.due);
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    if (dueDate < today) {
+                        overdueHTML = `<span class="status-badge" style="background-color: #000; margin-left: 5px;">⚠️ OVERDUE</span>`;
+                    }
+                }
+
+                let formattedID = `${escapeHTML(prefix)}-${String(snag.id).padStart(3, '0')}`;
+                
+                // XSS Fix applied to renders
+                let safeLocation = escapeHTML(snag.location || 'N/A');
+                let safeOwner = escapeHTML(snag.owner || 'N/A');
+                let safeDue = escapeHTML(snag.due || 'N/A');
+                let safeComment = escapeHTML(snag.comment || '').replace(/\n/g, '<br>');
+
+                batchedHTML += `
+                    <div class="snag-item">
+                        <div class="snag-photo-wrapper">
+                            ${imageContent}
+                        </div>
+                        <div class="snag-details">
+                            <div class="snag-id">
+                                ${formattedID}
+                                <span class="status-badge" style="background-color: ${badgeColor};">${escapeHTML(snag.status)}</span>
+                                <span class="status-badge" style="background-color: ${prioColor};">${escapeHTML(snag.priority || 'Medium')} Prio</span>
+                                ${overdueHTML}
+                            </div>
+                            <p><strong>Location:</strong> ${safeLocation}</p>
+                            <p><strong>Responsible:</strong> ${safeOwner}</p>
+                            <p><strong>Due Date:</strong> ${safeDue}</p>
+                            <p style="margin-top: 6px;"><strong>Description:</strong> ${safeComment}</p>
+                            
+                            <div class="delete-btn-container no-print">
+                                <select onchange="updateSnagStatus(${snag.id}, this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); margin-right: 10px; font-size: 0.9em; width: auto; display: inline-block;">
+                                    <option value="Open" ${snag.status === 'Open' ? 'selected' : ''}>Open</option>
+                                    <option value="In Progress" ${snag.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                    <option value="Closed" ${snag.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                                </select>
+                                <button class="btn btn-edit" onclick="editSnag(${snag.id})" style="padding: 5px 10px; font-size: 0.85em; margin-right: 5px;">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteSnag(${snag.id})" style="padding: 5px 10px; font-size: 0.85em;">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = batchedHTML; 
+            updateDashboard();
+            updateReportHeader(); 
+        }
+
+        function saveData() {
+            const projectData = {
+                reportTitle: document.getElementById('report-title').value,
+                projName: document.getElementById('proj-name').value,
+                projDate: document.getElementById('proj-date').value,
+                projManager: document.getElementById('proj-manager').value,
+                reportPrefix: document.getElementById('report-prefix').value,
+                reportLogo: document.getElementById('report-logo').value,
+                snags: snagData, 
+                counter: snagCounter
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", (projectData.projName || "project") + "_snags.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click(); downloadAnchorNode.remove();
+            hasUnsavedChanges = false;
+            localStorage.removeItem("snagProject"); // Clean local storage on manual save
+        }
+
+        function loadData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedData = JSON.parse(e.target.result);
+                    document.getElementById('report-title').value = loadedData.reportTitle || '';
+                    document.getElementById('proj-name').value = loadedData.projName || '';
+                    document.getElementById('proj-date').value = loadedData.projDate || '';
+                    document.getElementById('proj-manager').value = loadedData.projManager || '';
+                    document.getElementById('report-prefix').value = loadedData.reportPrefix || 'ADCOOP-SN';
+                    document.getElementById('report-logo').value = loadedData.reportLogo || 'https://logo.clearbit.com/adcoop.com';
+                    updateReportHeader();
+                    snagData = loadedData.snags || []; 
+                    snagCounter = loadedData.counter || 1; 
+                    renderSnags();
+                    hasUnsavedChanges = false; event.target.value = '';
+                } catch (err) { alert("Error loading file."); }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportPDF() {
+            const titleInput = document.getElementById('report-title');
+            if (!titleInput.value.trim()) {
+                const userTitle = prompt("Report Title is blank. Please enter a title or click OK to proceed anyway:", "");
+                if (userTitle === null) return; 
+                titleInput.value = userTitle.trim();
+                updateReportHeader();
+            }
+
+            const removeBtns = document.querySelectorAll('.no-print');
+            removeBtns.forEach(btn => btn.style.display = 'none');
+            const container = document.getElementById('report-container');
+            container.classList.add('pdf-export-mode');
+
+            const opt = {
+                margin:       [0.8, 0.5, 0.5, 0.5], 
+                filename:     (document.getElementById('proj-name').value || 'Snag_Report') + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    letterRendering: true,
+                    backgroundColor: "#ffffff"
+                },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
+            };
+
+            html2pdf().set(opt).from(container).toPdf().get('pdf').then(function (pdf) {
+                const totalPages = pdf.internal.getNumberOfPages();
+                
+                const reportTitleText = document.getElementById('report-title').value;
+                const projName = document.getElementById('proj-name').value || '[Not Set]';
+                const projPM = document.getElementById('proj-manager').value || '[Not Set]';
+                const dateElement = document.querySelector('.sync-proj-date');
+                const dateText = dateElement ? dateElement.innerText.replace('Date: ', '') : '[Not Set]';
+
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    
+                    if (i > 1) {
+                        pdf.setFontSize(11);
+                        pdf.setTextColor(44, 62, 80);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(reportTitleText.toUpperCase(), 0.5, 0.4);
+                        
+                        pdf.setFontSize(9);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`Project: ${projName}   |   PM: ${projPM}   |   Date: ${dateText}`, 0.5, 0.55);
+                        
+                        pdf.setDrawColor(189, 195, 199);
+                        pdf.setLineWidth(0.01);
+                        pdf.line(0.5, 0.65, pdf.internal.pageSize.getWidth() - 0.5, 0.65);
+                    }
+
+                    pdf.setFontSize(10); 
+                    pdf.setTextColor(100);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('Page ' + i + ' of ' + totalPages, (pdf.internal.pageSize.getWidth() / 2), (pdf.internal.pageSize.getHeight() - 0.2), { align: 'center' });
+                }
+            }).save().then(() => {
+                container.classList.remove('pdf-export-mode');
+                removeBtns.forEach(btn => btn.style.display = '');
+            });
+        }
+
+        async function exportExcel() {
+            const titleInput = document.getElementById('report-title');
+            if (!titleInput.value.trim()) {
+                const userTitle = prompt("Report Title is blank. Please enter a title or click OK to proceed anyway:", "");
+                if (userTitle === null) return; 
+                titleInput.value = userTitle.trim();
+                updateReportHeader();
+            }
+
+            const reportTitleText = document.getElementById('report-title').value;
+            const projName = document.getElementById('proj-name').value || 'N/A';
+            const projDate = document.getElementById('proj-date').value || 'N/A';
+            const projManager = document.getElementById('proj-manager').value || 'N/A';
+            const prefix = document.getElementById('report-prefix').value || 'ADCOOP-SN';
+            
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Snag List');
+
+            worksheet.addRow([reportTitleText.toUpperCase()]);
+            worksheet.addRow(["Project:", projName, "Date:", projDate]);
+            worksheet.addRow(["Manager:", projManager]);
+            worksheet.addRow([]); 
+            
+            // Excel Export Summary Dashboard Fix
+            const total = snagData.length;
+            const open = snagData.filter(s => s.status === 'Open').length;
+            const prog = snagData.filter(s => s.status === 'In Progress').length;
+            const closed = snagData.filter(s => s.status === 'Closed').length;
+            
+            worksheet.addRow(["Dashboard Summary", `Total: ${total}`, `Open: ${open}`, `In Progress: ${prog}`, `Closed: ${closed}`]);
+            worksheet.addRow([]);
+            
+            const headerRow = worksheet.addRow(["Ref ID", "Photo", "Location", "Responsible", "Due Date", "Priority", "Status", "Defect Description / Comments"]);
+            headerRow.font = { bold: true };
+
+            worksheet.columns = [
+                { width: 15 },  
+                { width: 25 },  
+                { width: 20 },  
+                { width: 20 },  
+                { width: 15 },  
+                { width: 15 },  
+                { width: 15 },  
+                { width: 50 }   
+            ];
+
+            let currentRow = 8; // Offset for new summary rows
+
+            // Respect the active filters for Excel Export!
+            const filterText = document.getElementById('filter-text').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status-view').value;
+            const filterPriority = document.getElementById('filter-priority-view').value;
+
+            snagData.forEach((snag) => {
+                if (filterStatus !== 'All' && snag.status !== filterStatus) return;
+                if (filterPriority !== 'All' && snag.priority !== filterPriority) return;
+                if (filterText) {
+                    const searchStr = `${snag.location || ''} ${snag.owner || ''} ${snag.comment || ''}`.toLowerCase();
+                    if (!searchStr.includes(filterText)) return;
+                }
+
+                let formattedID = `${prefix}-${String(snag.id).padStart(3, '0')}`;
+                
+                const row = worksheet.addRow([
+                    formattedID, 
+                    "", 
+                    snag.location || 'N/A', 
+                    snag.owner || 'N/A', 
+                    snag.due || 'N/A', 
+                    snag.priority || 'Medium',
+                    snag.status || 'Open', 
+                    snag.comment
+                ]);
+
+                row.height = 90; 
+                row.alignment = { vertical: 'middle', wrapText: true };
+
+                // Status Column Coloring Fix
+                const statusCell = row.getCell(7);
+                statusCell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
+                if (snag.status === 'Open') {
+                    statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE74C3C' } };
+                } else if (snag.status === 'In Progress') {
+                    statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE67E22' } };
+                } else if (snag.status === 'Closed') {
+                    statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF27AE60' } };
+                }
+
+                // PNG Extension Check Fix
+                if (snag.image) {
+                    const base64Data = snag.image.split(',')[1];
+                    const imgExt = snag.image.includes("png") ? "png" : "jpeg"; 
+                    const imageId = workbook.addImage({
+                        base64: base64Data,
+                        extension: imgExt,
+                    });
+
+                    worksheet.addImage(imageId, {
+                        tl: { col: 1.1, row: currentRow - 1 + 0.1 }, 
+                        ext: { width: 140, height: 100 }
+                    });
+                }
+                
+                currentRow++;
+            });
+            
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.href = URL.createObjectURL(blob);
+            downloadAnchorNode.download = (projName !== 'N/A' && projName !== '' ? projName : 'Project') + "_Snags.xlsx";
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+        
+        // --- AUTO-SAVE LOGIC ---
+        function autoSave() {
+            if (!hasUnsavedChanges && snagData.length === 0) return;
+            const projectData = {
+                reportTitle: document.getElementById('report-title').value,
+                projName: document.getElementById('proj-name').value,
+                projDate: document.getElementById('proj-date').value,
+                projManager: document.getElementById('proj-manager').value,
+                reportPrefix: document.getElementById('report-prefix').value,
+                reportLogo: document.getElementById('report-logo').value,
+                snags: snagData,
+                counter: snagCounter
+            };
+            localStorage.setItem("snagProject", JSON.stringify(projectData));
+            hasUnsavedChanges = false;
+        }
+
+        setInterval(autoSave, 5000);
+
+        window.onload = function() {
+            let saved = localStorage.getItem("snagProject");
+            if(saved){
+                if (confirm("Found an unsaved session. Would you like to restore it?")) {
+                    let data = JSON.parse(saved);
+                    document.getElementById('report-title').value = data.reportTitle || '';
+                    document.getElementById('proj-name').value = data.projName || '';
+                    document.getElementById('proj-date').value = data.projDate || '';
+                    document.getElementById('proj-manager').value = data.projManager || '';
+                    document.getElementById('report-prefix').value = data.reportPrefix || 'ADCOOP-SN';
+                    document.getElementById('report-logo').value = data.reportLogo || 'https://logo.clearbit.com/adcoop.com';
+                    
+                    snagData = data.snags || [];
+                    snagCounter = data.counter || 1;
+                    
+                    renderSnags();
+                    updateReportHeader();
+                } else {
+                    localStorage.removeItem("snagProject");
+                    updateReportHeader();
+                }
+            } else {
+                updateReportHeader();
+            }
+        };
+
+        // --- PWA SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('Service worker registration failed:', err);
+            });
+        }
+
+    </script>
+</body>
+</html>
