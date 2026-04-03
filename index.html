@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,1183 +9,649 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
-            --action-color: #2980b9;
-            --border-color: #bdc3c7;
+        /* ══════════════════════════════════════
+           LIGHT / BEIGE THEME  (default)
+        ══════════════════════════════════════ */
+        :root,
+        [data-theme="light"] {
+            --bg-page:       #f0e8d8;
+            --bg-panel:      #fdf8f0;
+            --bg-card:       #f7f1e6;
+            --bg-input:      #fdf8f0;
+            --border:        #d4c4a8;
+            --border-hi:     #b8a488;
+            --accent:        #1864c4;
+            --accent-glow:   rgba(24,100,196,0.15);
+            --gold:          #9a6800;
+            --text-pri:      #2a1f0e;
+            --text-sec:      #5a4a30;
+            --text-muted:    #9a8868;
+            --success:       #0a7a58;
+            --danger:        #c02236;
+            --warning:       #a85800;
+            --grid-ln:       rgba(154,104,0,0.06);
+            --shadow:        0 2px 10px rgba(0,0,0,0.08);
+            --hdr-bg:        linear-gradient(135deg,#15387a 0%,#1a4c96 100%);
+            --panel-hdr-bg:  linear-gradient(90deg,#ede3d0,transparent);
+            --drop-bg:       #f7f1e4;
+            --snag-img-bg:   #ede3d0;
+            --mono:          'Share Tech Mono', monospace;
+            --ui:            'Rajdhani', sans-serif;
         }
 
-        * { box-sizing: border-box; }
+        /* ══════════════════════════════════════
+           DARK THEME
+        ══════════════════════════════════════ */
+        [data-theme="dark"] {
+            --bg-page:       #060e1f;
+            --bg-panel:      #0d1b2e;
+            --bg-card:       #111f35;
+            --bg-input:      #0a1628;
+            --border:        #1e3a5f;
+            --border-hi:     #2a5080;
+            --accent:        #2196f3;
+            --accent-glow:   rgba(33,150,243,0.28);
+            --gold:          #f0c040;
+            --text-pri:      #d0e4f7;
+            --text-sec:      #7a9ec0;
+            --text-muted:    #3d6080;
+            --success:       #00c896;
+            --danger:        #f04060;
+            --warning:       #f0a020;
+            --grid-ln:       rgba(33,150,243,0.05);
+            --shadow:        0 4px 20px rgba(0,0,0,0.4);
+            --hdr-bg:        linear-gradient(135deg,#0a1628 0%,#0d1f3a 100%);
+            --panel-hdr-bg:  linear-gradient(90deg,#111f35,transparent);
+            --drop-bg:       #0a1628;
+            --snag-img-bg:   #080f1a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f6fa;
-            color: #333;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
+            font-family: var(--ui);
+            background: var(--bg-page);
+            color: var(--text-pri);
+            min-height: 100vh;
+            background-image:
+                linear-gradient(var(--grid-ln) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-ln) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        h2 {
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--action-color);
-            padding-bottom: 10px;
+        /* ── HEADER ── */
+        .app-header {
+            background: var(--hdr-bg);
+            padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 62px;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 3px 18px rgba(0,0,0,0.28);
+        }
+        .app-header::after {
+            content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+            background: linear-gradient(90deg,transparent,var(--accent),#f0c040,var(--accent),transparent);
+            opacity:.85;
+        }
+        .header-brand { display:flex; align-items:center; gap:12px; }
+        .header-icon { width:36px; height:36px; background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.22); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+        .header-title { font-family:var(--ui); font-size:1.2em; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fff; }
+        .header-title span { color:#82c8f8; }
+        .header-sub { font-family:var(--mono); font-size:0.67em; color:rgba(255,255,255,0.4); letter-spacing:1px; }
+        .header-right { display:flex; align-items:center; gap:9px; }
+        .header-actions { display:flex; gap:6px; align-items:center; }
+
+        /* ── THEME PILL ── */
+        .theme-pill { display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:22px; padding:5px 11px 5px 7px; cursor:pointer; transition:background .2s; user-select:none; }
+        .theme-pill:hover { background:rgba(255,255,255,0.2); }
+        .tp-track { width:34px; height:18px; background:rgba(255,255,255,0.2); border-radius:9px; position:relative; transition:background .3s; flex-shrink:0; }
+        [data-theme="dark"] .tp-track { background:#2196f3; }
+        .tp-thumb { width:14px; height:14px; background:#fff; border-radius:50%; position:absolute; top:2px; left:2px; transition:transform .3s cubic-bezier(.34,1.56,.64,1); box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+        [data-theme="dark"] .tp-thumb { transform:translateX(16px); }
+        .tp-icon { font-size:0.95em; line-height:1; }
+        .tp-label { font-family:var(--mono); font-size:0.68em; color:rgba(255,255,255,0.75); letter-spacing:1px; text-transform:uppercase; white-space:nowrap; }
+
+        /* ── HEADER BTNS ── */
+        .btn-hdr { font-family:var(--ui); font-weight:600; font-size:0.82em; letter-spacing:.7px; text-transform:uppercase; padding:7px 13px; border-radius:5px; cursor:pointer; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); display:inline-flex; align-items:center; gap:5px; white-space:nowrap; transition:all .2s; }
+        .btn-hdr:hover { background:rgba(255,255,255,0.22); border-color:rgba(255,255,255,0.35); }
+
+        /* ── LAYOUT ── */
+        .main-layout { max-width:1100px; margin:0 auto; padding:22px 18px; display:flex; flex-direction:column; gap:16px; }
+
+        /* ── PANELS ── */
+        .panel { background:var(--bg-panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); transition:background .3s, border-color .3s; }
+        .panel-hdr { background:var(--panel-hdr-bg); border-bottom:1px solid var(--border); padding:10px 18px; display:flex; align-items:center; gap:9px; }
+        .phdr-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent-glow); flex-shrink:0; }
+        .panel-ttl { font-family:var(--mono); font-size:0.76em; letter-spacing:2px; text-transform:uppercase; color:var(--accent); }
+        .panel-body { padding:18px; }
+
+        /* ── GRIDS ── */
+        .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:13px; }
+        .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
+
+        /* ── FORMS ── */
+        .fg { display:flex; flex-direction:column; gap:5px; }
+        label { font-family:var(--mono); font-size:0.69em; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-sec); }
+        input[type="text"], input[type="date"], select, textarea { background:var(--bg-input); border:1px solid var(--border); border-radius:5px; color:var(--text-pri); font-family:var(--ui); font-size:0.94em; font-weight:500; padding:9px 12px; width:100%; outline:none; transition:border-color .2s, box-shadow .2s, background .3s; -webkit-appearance:none; }
+        input:focus, select:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+        select option { background:var(--bg-panel); color:var(--text-pri); }
+        textarea { resize:vertical; min-height:88px; line-height:1.55; }
+
+        /* ── BUTTONS ── */
+        .btn { font-family:var(--ui); font-weight:700; font-size:0.86em; letter-spacing:.7px; text-transform:uppercase; padding:9px 15px; border:none; border-radius:5px; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+        .btn-gold { background:var(--gold); color:#fff; }
+        .btn-gold:hover { filter:brightness(1.1); }
+        .btn-ghost { background:transparent; color:var(--text-sec); border:1px solid var(--border); }
+        .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+        .btn-danger { background:transparent; color:var(--danger); border:1px solid rgba(192,34,54,0.35); }
+        .btn-danger:hover { background:rgba(192,34,54,0.07); }
+        .btn-edit { background:transparent; color:var(--warning); border:1px solid rgba(168,88,0,0.35); }
+        .btn-edit:hover { background:rgba(168,88,0,0.07); }
+        .btn-success { background:transparent; color:var(--success); border:1px solid rgba(10,122,88,0.35); }
+        .btn-success:hover { background:rgba(10,122,88,0.07); }
+        .btn-markup { background:transparent; color:#7c5abf; border:1px solid rgba(124,90,191,0.35); }
+        [data-theme="dark"] .btn-markup { color:#a78bfa; border-color:rgba(167,139,250,0.3); }
+        .btn-markup:hover { background:rgba(124,90,191,0.08); }
+        .btn-full { width:100%; justify-content:center; padding:12px; font-size:0.94em; }
+
+        /* ── DASHBOARD ── */
+        .dash-wrap { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .dash-card { background:var(--bg-card); border:1px solid var(--border); border-radius:6px; padding:13px 16px; text-align:center; transition:background .3s, border-color .3s; }
+        .dash-val { font-family:var(--mono); font-size:1.9em; font-weight:700; display:block; line-height:1; margin-bottom:4px; color:var(--accent); }
+        .dash-lbl { font-family:var(--mono); font-size:0.66em; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); }
+
+        /* ── FILTER BAR ── */
+        .filter-bar { display:flex; gap:10px; align-items:center; padding:12px 16px; background:var(--bg-panel); border-radius:8px; border:1px solid var(--border); box-shadow:var(--shadow); transition:background .3s; }
+        .filter-bar label { color:var(--text-muted); font-size:0.72em; white-space:nowrap; }
+        .filter-bar input { background:var(--bg-input); flex:1; }
+
+        /* ── DROP ZONE ── */
+        .drop-zone { border:2px dashed var(--border); border-radius:6px; padding:22px; text-align:center; background:var(--drop-bg); cursor:pointer; transition:all .25s; margin-bottom:13px; display:block; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color:var(--accent); background:var(--accent-glow); }
+        .dz-icon { font-size:1.7em; display:block; margin-bottom:7px; }
+        .dz-text { font-size:0.87em; color:var(--text-sec); display:block; }
+        .dz-sub  { font-size:0.74em; color:var(--text-muted); display:block; margin-top:3px; }
+
+        /* ── MARKUP EDITOR ── */
+        #markup-container { display:none; margin-bottom:13px; }
+        #cropper-wrapper { height:350px; background:#111; margin-bottom:9px; border-radius:5px; overflow:hidden; }
+        #markup-canvas { border:1px solid var(--border-hi); border-radius:4px; max-width:100%; touch-action:none; cursor:crosshair; background:#eee; display:block; }
+        .edit-tb { display:flex; gap:7px; margin-bottom:9px; flex-wrap:wrap; }
+        .edit-tb .btn { flex:1; }
+
+        /* ── SNAG ITEMS ── */
+        #snag-list { display:flex; flex-direction:column; gap:12px; }
+        .snag-item { display:flex; background:var(--bg-card); border:1px solid var(--border); border-radius:7px; overflow:hidden; transition:border-color .2s, background .3s; page-break-inside:avoid !important; box-shadow:var(--shadow); }
+        .snag-item:hover { border-color:var(--border-hi); }
+        .snag-photo-wrap { width:168px; min-width:168px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--border); background:var(--snag-img-bg); flex-shrink:0; }
+        .snag-photo { max-width:100%; max-height:175px; object-fit:contain; display:block; }
+        .no-img { color:var(--text-muted); font-family:var(--mono); font-size:0.71em; letter-spacing:1px; text-align:center; padding:20px; }
+        .snag-body { padding:13px 17px; flex-grow:1; display:flex; flex-direction:column; min-width:0; }
+        .snag-top { display:flex; align-items:center; gap:10px; margin-bottom:9px; padding-bottom:9px; border-bottom:1px solid var(--border); }
+        .snag-ref { font-family:var(--mono); font-size:1em; color:var(--gold); font-weight:700; letter-spacing:1px; }
+        .snag-desc { font-size:0.94em; color:var(--text-pri); line-height:1.6; flex-grow:1; word-wrap:break-word; overflow-wrap:break-word; }
+        .snag-acts { margin-top:11px; display:flex; justify-content:flex-end; gap:7px; }
+
+        /* ── REPORT HEADER BLOCK ── */
+        .rpt-hdr-block { background:var(--bg-panel); border:1px solid var(--border); border-radius:8px; padding:17px 19px; margin-bottom:16px; box-shadow:var(--shadow); transition:background .3s; }
+        .rpt-title { font-family:var(--ui); font-size:1.2em; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--text-pri); text-align:center; margin-bottom:13px; }
+        .rpt-meta-row { display:flex; justify-content:space-between; align-items:center; }
+        .rpt-meta-text { font-size:0.88em; color:var(--text-sec); line-height:1.8; }
+        .rpt-meta-text strong { color:var(--text-pri); }
+        .rpt-logo img { max-height:46px; max-width:145px; object-fit:contain; }
+
+        /* ── MISC ── */
+        .divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:13px 0; }
+        .sec-lbl { font-family:var(--mono); font-size:0.69em; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:9px; display:flex; align-items:center; gap:8px; }
+        .sec-lbl::after { content:''; flex:1; height:1px; background:var(--border); }
+
+        /* ── RESPONSIVE (Placed BEFORE PDF Rules so PDF overrides it) ── */
+        @media (max-width:700px) {
+            .app-header { padding:0 11px; }
+            .tp-label { display:none; }
+            .main-layout { padding:11px 10px; }
+            .g3, .g4 { grid-template-columns:1fr; }
+            .snag-item { flex-direction:column; }
+            .snag-photo-wrap { width:100%; min-width:unset; height:155px; border-right:none; border-bottom:1px solid var(--border); }
+            #cropper-wrapper { height:250px; }
         }
 
-        .panel {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .grid-5 {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 0.9em;
-            color: var(--secondary-color);
-        }
-
-        input[type="text"], input[type="date"], select, textarea, input[type="file"] {
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 16px;
-            width: 100%;
-            background-color: #fff;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn {
-            background-color: var(--action-color);
-            color: white;
-            border: none;
-            padding: 12px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: background 0.3s;
-            text-align: center;
-        }
-
-        .btn:hover { background-color: #21618c; }
-        .btn-danger { background-color: #e74c3c; }
-        .btn-danger:hover { background-color: #c0392b; }
-        .btn-success { background-color: #27ae60; }
-        .btn-success:hover { background-color: #2ecc71; }
-        .btn-edit { background-color: #f39c12; }
-        .btn-edit:hover { background-color: #d68910; }
-
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #eef2f5;
-            border-radius: 8px;
-        }
-
-        #report-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        /* --- DASHBOARD STYLES --- */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .dash-card {
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            border: 1px solid #eee;
-        }
-        .dash-total { background: #eef2f5; color: #2c3e50; grid-column: 1; grid-row: 1; }
-        .dash-prog { background: #fdf2e9; color: #d35400; grid-column: 2; grid-row: 1; }
-        .dash-open { background: #fdedec; color: #c0392b; grid-column: 1; grid-row: 2; }
-        .dash-closed { background: #eafaf1; color: #27ae60; grid-column: 2; grid-row: 2; }
-
-        .snag-item {
-            display: flex;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            page-break-inside: avoid !important;
-        }
-
-        .snag-photo-wrapper {
-            width: 160px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-right: 1px solid var(--border-color);
-            background: #fdfdfd;
-            flex-shrink: 0;
-        }
-
-        .snag-photo {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-        }
-
-        .snag-details {
-            padding: 12px 15px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            font-size: 0.9em;
-        }
-
-        .snag-details p {
-            margin: 4px 0;
-            line-height: 1.4;
-        }
-
-        .snag-id {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 8px;
-            font-size: 1.1em;
-            border-bottom: 1px dashed #eee;
-            padding-bottom: 6px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .status-badge {
-            font-size: 0.75em;
-            padding: 3px 8px;
-            border-radius: 12px;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .delete-btn-container {
-            margin-top: auto;
-            text-align: right;
-            padding-top: 10px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 5px;
-        }
-
-        .delete-btn-container .btn {
-            padding: 5px 10px;
-            font-size: 0.85em;
-        }
-
-        /* Styles for Image Markup/Edit Area */
-        #markup-container { display: none; margin-bottom: 15px; width: 100%; }
-        #cropper-wrapper { height: 400px; background: #333; margin-bottom: 10px; }
-        #markup-canvas { border: 2px solid var(--action-color); border-radius: 4px; max-width: 100%; touch-action: none; cursor: crosshair; background-color: #eee; }
-        .edit-toolbar { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
-        .edit-toolbar .btn { padding: 8px 12px; font-size: 0.9em; flex-grow: 1; }
-
-        .no-screen { display: none !important; }
-        .no-print { display: block; }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
-            .toolbar { flex-direction: column; }
-            .btn { width: 100%; padding: 15px; }
-            .snag-item { flex-direction: column; }
-            .snag-photo-wrapper { width: 100%; height: 180px; border-right: none; border-bottom: 1px solid var(--border-color); }
-            .report-header { flex-direction: column; gap: 5px; }
-            .dashboard { display: flex; flex-direction: column; }
-            #cropper-wrapper { height: 300px; }
-        }
-
-        /* --- PDF EXPORT RULES --- */
+        /* ══════════════════════════════════════
+           PDF EXPORT MODE (CLEAN & STABLE)
+        ══════════════════════════════════════ */
         .pdf-export-mode {
-            width: 760px !important;   
-            max-width: none !important;
-            padding: 0 10px !important;  
+            width: 760px !important;
+            max-width: 760px !important;
+            min-width: 760px !important;
             margin: 0 auto !important;
+            padding: 0 10px 10px 10px !important; /* Top padding removed so it sits flush to margin */
             background-color: #fff !important;
+            color: #222 !important;
             box-sizing: border-box !important;
         }
 
-        .pdf-export-mode .dashboard {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            width: 350px !important; 
-            gap: 10px !important;
-            margin-bottom: 20px !important;
+        .pdf-export-mode .rpt-hdr-block {
+            background: #fdf8f0 !important;
+            border: 1px solid #d4c4a8 !important;
+            border-radius: 4px !important;
+            box-shadow: none !important;
+            padding: 16px !important;
+            margin-top: 0 !important; /* Forces top alignment */
+            margin-bottom: 16px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
+        .pdf-export-mode .rpt-title { color: #1a1208 !important; font-size: 15px !important; margin-bottom: 10px !important; }
+        .pdf-export-mode .rpt-meta-text { color: #3a2e1a !important; font-size: 11px !important; line-height: 1.7 !important; }
+        .pdf-export-mode .rpt-meta-text strong { color: #1a1208 !important; }
+        .pdf-export-mode .rpt-logo img { max-height: 42px !important; filter: none !important; }
+        .pdf-export-mode .divider { background: #c8baa0 !important; margin: 10px 0 !important; }
 
-        .pdf-export-mode .dash-card {
-            font-size: 12px !important;
-            padding: 10px !important;
+        .pdf-export-mode .dash-wrap {
+            display: block !important;
+            width: 220px !important;
+            margin-bottom: 16px !important;
         }
-        
-        .pdf-export-mode .no-screen { display: block !important; }
-        
+        .pdf-export-mode .dash-card {
+            background: #f0ebe0 !important;
+            border: 1px solid #c8baa0 !important;
+            border-radius: 4px !important;
+            padding: 10px 14px !important;
+        }
+        .pdf-export-mode .dash-val { color: #1864c4 !important; font-size: 20px !important; }
+        .pdf-export-mode .dash-lbl { color: #6a5a3a !important; font-size: 9px !important; }
+
+        .pdf-export-mode .sec-lbl { color: #6a5a3a !important; font-size: 9px !important; margin-bottom: 8px !important; }
+        .pdf-export-mode .sec-lbl::after { background: #c8baa0 !important; }
+
+        .pdf-export-mode #snag-list { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100% !important; }
+
         .pdf-export-mode .snag-item {
             display: flex !important;
             flex-direction: row !important;
-            page-break-inside: avoid !important;
-            margin-bottom: 15px !important;
-            border: none !important;
-            outline: 1px solid #bdc3c7 !important; 
-            border-radius: 4px !important;
+            flex-wrap: nowrap !important;
             width: 100% !important;
             box-sizing: border-box !important;
-            height: auto !important; 
+            background: #fff !important;
+            border: 1px solid #c8baa0 !important;
+            border-radius: 4px !important;
+            box-shadow: none !important;
+            page-break-inside: avoid !important;
+            margin-bottom: 10px !important;
         }
-        
-        .pdf-export-mode .snag-photo-wrapper {
-            width: 200px !important; 
+
+        .pdf-export-mode .snag-photo-wrap {
+            width: 200px !important;
             min-width: 200px !important;
             max-width: 200px !important;
-            border-right: 1px solid #bdc3c7 !important; 
+            flex-shrink: 0 !important;
+            background: #fdf8f0 !important;
+            border-right: 1px solid #c8baa0 !important;
             border-bottom: none !important;
-            box-sizing: border-box !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-        }
-        
-        .pdf-export-mode .snag-details {
-            padding: 15px !important;
-            font-size: 12px !important; 
-            width: calc(100% - 200px) !important; 
+            padding: 8px !important;
             box-sizing: border-box !important;
-            word-wrap: break-word !important; 
         }
-        
-        .pdf-export-mode .snag-id {
-            font-size: 14px !important;
-            margin-bottom: 6px !important;
+
+        .pdf-export-mode .snag-photo {
+            max-width: 100% !important;
+            max-height: 160px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+            display: block !important;
+        }
+
+        .pdf-export-mode .no-img { color: #9a8868 !important; font-size: 9px !important; padding: 16px !important; }
+
+        .pdf-export-mode .snag-body {
+            flex: 1 1 auto !important;
+            width: calc(100% - 200px) !important;
+            min-width: 0 !important;
+            padding: 12px 14px !important;
+            box-sizing: border-box !important;
+            display: block !important;
+        }
+
+        .pdf-export-mode .snag-top {
             display: flex !important;
             align-items: center !important;
+            border-bottom: 1px solid #ddd !important;
+            margin-bottom: 8px !important;
+            padding-bottom: 6px !important;
         }
-        
-        .pdf-export-mode .report-header {
-            display: flex !important;
-            flex-direction: row !important;
-            justify-content: space-between !important;
-            width: 100% !important; 
-            margin-bottom: 15px !important;
-            padding-bottom: 10px !important;
-            font-size: 14px !important;
-            text-align: left !important;
-            box-sizing: border-box !important;
+
+        .pdf-export-mode .snag-ref { color: #9a6800 !important; font-size: 13px !important; }
+        .pdf-export-mode .snag-desc {
+            color: #2a1f0e !important;
+            font-size: 11px !important;
+            line-height: 1.55 !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            word-break: break-word !important;
+            white-space: normal !important;
+            display: block !important;
         }
+
+        .pdf-export-mode .no-print { display: none !important; }
     </style>
 </head>
 <body>
 
-    <h2>Construction Snag Tracker</h2>
-
-    <div class="toolbar no-print">
-        <button class="btn btn-success" onclick="saveData()">💾 Save Project</button>
-        <input type="file" id="load-file" style="display: none;" accept=".json" onchange="loadData(event)">
-        <button class="btn btn-success" onclick="document.getElementById('load-file').click()">📂 Load Project</button>
-        <button class="btn" onclick="exportPDF()">📄 Export to PDF</button>
-        <button class="btn" onclick="exportExcel()">📊 Export to Excel</button>
-    </div>
-
-    <div class="panel no-print">
-        <div class="grid-4" style="margin-bottom: 15px;">
-            <div class="form-group">
-                <label>Report Title</label>
-                <input type="text" id="report-title" placeholder="e.g., Defect Liability Report" oninput="updateReportHeader()">
-            </div>
-            <div class="form-group">
-                <label>Project Name</label>
-                <input type="text" id="proj-name" placeholder="e.g., Tower B Fit-out" oninput="updateReportHeader()">
-            </div>
-            <div class="form-group">
-                <label>Inspection Date</label>
-                <input type="date" id="proj-date" oninput="updateReportHeader()">
-            </div>
-            <div class="form-group">
-                <label>Project Manager</label>
-                <input type="text" id="proj-manager" placeholder="Name" oninput="updateReportHeader()">
+    <header class="app-header">
+        <div class="header-brand">
+            <div class="header-icon">📋</div>
+            <div>
+                <div class="header-title">Snag <span>Tracker</span></div>
+                <div class="header-sub">CONSTRUCTION DEFECT LOG</div>
             </div>
         </div>
-        <div class="grid-4" style="border-top: 1px solid #eee; padding-top: 15px;">
-            <div class="form-group">
-                <label>Snag Prefix (ID)</label>
-                <input type="text" id="report-prefix" value="ADCOOP-SN" oninput="updateReportHeader()">
+        <div class="header-right">
+            <div class="theme-pill no-print" onclick="toggleTheme()" title="Toggle theme">
+                <div class="tp-track"><div class="tp-thumb"></div></div>
+                <span class="tp-icon" id="theme-icon">☀️</span>
+                <span class="tp-label" id="theme-label">Light</span>
             </div>
-            <div class="form-group" style="grid-column: span 2;">
-                <label>Logo Image URL</label>
-                <input type="text" id="report-logo" value="https://logo.clearbit.com/adcoop.com" oninput="updateReportHeader()">
+            <div class="header-actions no-print">
+                <button class="btn-hdr" onclick="saveData()">💾 Save</button>
+                <input type="file" id="load-file" style="display:none;" accept=".json" onchange="loadData(event)">
+                <button class="btn-hdr" onclick="document.getElementById('load-file').click()">📂 Load</button>
+                <button class="btn-hdr" onclick="exportPDF()">📄 PDF</button>
+                <button class="btn-hdr" onclick="exportExcel()">📊 Excel</button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="panel no-print">
-        <div class="grid-5" style="margin-bottom: 15px;">
-            <div class="form-group">
-                <label>Location / Area</label>
-                <input type="text" id="snag-location" placeholder="e.g., Level 2 - Elec Room">
+    <div class="main-layout">
+
+        <div class="panel no-print">
+            <div class="panel-hdr">
+                <div class="phdr-dot"></div>
+                <span class="panel-ttl">Project Configuration</span>
             </div>
-            <div class="form-group">
-                <label>Responsible Party</label>
-                <input type="text" id="snag-owner" placeholder="e.g., HVAC Contractor">
-            </div>
-            <div class="form-group">
-                <label>Due Date</label>
-                <input type="date" id="snag-due">
-            </div>
-            <div class="form-group">
-                <label>Priority</label>
-                <select id="snag-priority">
-                    <option value="High">High</option>
-                    <option value="Medium" selected>Medium</option>
-                    <option value="Low">Low</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="snag-status">
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Closed">Closed</option>
-                </select>
+            <div class="panel-body">
+                <div class="g4" style="margin-bottom:13px;">
+                    <div class="fg"><label>Report Title</label><input type="text" id="report-title" placeholder="e.g. Defect Liability Report" oninput="updateReportHeader()"></div>
+                    <div class="fg"><label>Project Name</label><input type="text" id="proj-name" placeholder="e.g. Tower B Fit-out" oninput="updateReportHeader()"></div>
+                    <div class="fg"><label>Inspection Date</label><input type="date" id="proj-date" oninput="updateReportHeader()"></div>
+                    <div class="fg"><label>Project Manager</label><input type="text" id="proj-manager" placeholder="Name" oninput="updateReportHeader()"></div>
+                </div>
+                <div class="g3">
+                    <div class="fg"><label>Snag ID Prefix</label><input type="text" id="report-prefix" value="ADCOOP-SN" oninput="updateReportHeader()"></div>
+                    <div class="fg" style="grid-column:span 2;"><label>Logo Image URL</label><input type="text" id="report-logo" value="https://logo.clearbit.com/adcoop.com" oninput="updateReportHeader()"></div>
+                </div>
             </div>
         </div>
 
-        <div class="form-group">
-            <div id="drop-zone" style="border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 4px; margin-bottom: 10px; background-color: #fdfdfd; transition: all 0.3s ease;">
-                <label style="cursor: pointer; display: block; width: 100%; height: 100%; margin: 0;">
-                    <span style="font-size: 1.2em; display: block; margin-bottom: 8px; color: var(--primary-color);">📁 Drag & Drop Photo Here</span>
-                    <span style="font-size: 0.9em; color: var(--secondary-color);">or click to browse (Optional)</span>
-                    <input type="file" id="snag-photo" accept="image/*" style="display: none;">
+        <div class="panel no-print">
+            <div class="panel-hdr">
+                <div class="phdr-dot" style="background:var(--gold); box-shadow:0 0 7px rgba(154,104,0,0.4);"></div>
+                <span class="panel-ttl">Add / Edit Snag</span>
+            </div>
+            <div class="panel-body">
+                <div class="sec-lbl">Photo</div>
+                <label for="snag-photo" id="drop-zone" class="drop-zone">
+                    <span class="dz-icon">📷</span>
+                    <span class="dz-text">Drag &amp; Drop Photo Here</span>
+                    <span class="dz-sub">or click to browse &nbsp;·&nbsp; Optional</span>
+                    <input type="file" id="snag-photo" accept="image/*" style="display:none;">
                 </label>
-            </div>
-            
-            <button class="btn" id="btn-markup" style="display: none; margin-bottom: 15px; width: 200px; background-color: #8e44ad;" onclick="showEditor()">✏️ Edit & Markup Photo</button>
-            
-            <div id="markup-container">
-                <div id="cropper-stage">
-                    <div class="edit-toolbar">
-                        <button class="btn" onclick="rotateImage(-90)">🔄 Rotate Left</button>
-                        <button class="btn" onclick="rotateImage(90)">🔄 Rotate Right</button>
-                        <button class="btn btn-success" onclick="applyEditsAndSwitchToDraw()">✅ Apply Edits & Draw</button>
+                <button class="btn btn-markup" id="btn-markup" style="display:none;margin-bottom:13px;" onclick="showEditor()">✏️ Edit &amp; Markup Photo</button>
+                <div id="markup-container">
+                    <div id="cropper-stage">
+                        <div class="edit-tb">
+                            <button class="btn btn-ghost" onclick="rotateImage(-90)">↺ Rotate Left</button>
+                            <button class="btn btn-ghost" onclick="rotateImage(90)">↻ Rotate Right</button>
+                            <button class="btn btn-success" onclick="applyEditsAndSwitchToDraw()">✅ Apply &amp; Draw</button>
+                        </div>
+                        <div id="cropper-wrapper"><img id="image-to-edit" style="max-width:100%;display:block;"></div>
                     </div>
-                    <div id="cropper-wrapper">
-                        <img id="image-to-edit" style="max-width: 100%; display: block;">
+                    <div id="drawing-stage" style="display:none;">
+                        <div class="sec-lbl" style="margin-bottom:7px;">Draw on photo — Red Ink</div>
+                        <canvas id="markup-canvas"></canvas>
+                        <button class="btn btn-danger" style="margin-top:8px;" onclick="undoDrawing()">↩ Undo Last Stroke</button>
                     </div>
                 </div>
-                <div id="drawing-stage" style="display: none;">
-                    <label>Draw on photo to highlight defect (Red Ink):</label>
-                    <canvas id="markup-canvas"></canvas>
-                    <button class="btn btn-danger" style="margin-top: 5px; padding: 8px; width: auto;" onclick="undoDrawing()">Undo Last Stroke</button>
+                <div class="sec-lbl" style="margin-top:5px;">Description / Defect Details</div>
+                <div class="fg" style="margin-bottom:15px;">
+                    <textarea id="snag-comment" placeholder="Describe the defect and required corrective action..."></textarea>
                 </div>
-            </div>
-
-            <textarea id="snag-comment" placeholder="Describe the defect and required action..." style="margin-top: 10px;"></textarea>
-            <button class="btn" id="btn-add-snag" style="margin-top: 15px;" onclick="addSnag()">+ Add Snag</button>
-        </div>
-    </div>
-
-    <div class="panel no-print" style="display: flex; gap: 10px; align-items: center; background: #eef2f5; padding: 10px 20px;">
-        <strong style="white-space: nowrap;">🔍 Filter:</strong>
-        <input type="text" id="filter-text" placeholder="Search location, desc..." oninput="renderSnags()" style="flex: 1; padding: 8px;">
-        <select id="filter-status-view" onchange="renderSnags()" style="width: auto; padding: 8px;">
-            <option value="All">All Statuses</option>
-            <option value="Open">Open</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Closed">Closed</option>
-        </select>
-        <select id="filter-priority-view" onchange="renderSnags()" style="width: auto; padding: 8px;">
-            <option value="All">All Priorities</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-        </select>
-    </div>
-
-    <div id="report-container">
-        <div id="pdf-header-wrapper">
-            <h3 id="display-report-title" class="sync-report-title" style="text-align: center; margin-top: 0; color: var(--primary-color);"></h3>
-            
-            <div class="report-header">
-                <div>
-                    <strong style="font-size: 1.2em;" class="sync-proj-name">Project: [Not Set]</strong><br>
-                    <span class="sync-proj-manager">PM: [Not Set]</span><br>
-                    <strong class="sync-proj-date">Date: [Not Set]</strong>
-                </div>
-                <div style="text-align: right;">
-                    <img id="display-report-logo" src="https://logo.clearbit.com/adcoop.com" alt="Company Logo" style="max-height: 50px; max-width: 150px; object-fit: contain;">
-                </div>
+                <button class="btn btn-gold btn-full" id="btn-add-snag" onclick="addSnag()">+ Add Snag</button>
             </div>
         </div>
 
-        <div class="dashboard">
-            <div class="dash-card dash-total">Total Snags: <span id="dash-total-val">0</span></div>
-            <div class="dash-card dash-prog">In Progress: <span id="dash-prog-val">0</span></div>
-            <div class="dash-card dash-open">Open: <span id="dash-open-val">0</span></div>
-            <div class="dash-card dash-closed">Closed: <span id="dash-closed-val">0</span></div>
+        <div class="filter-bar no-print">
+            <label>🔍 Search</label>
+            <input type="text" id="filter-text" placeholder="Filter by description..." oninput="renderSnags()" style="max-width:420px;">
         </div>
 
-        <div id="snag-list"></div>
+        <div id="report-container">
+            <div class="rpt-hdr-block">
+                <div class="rpt-title sync-rpt-title"></div>
+                <div class="divider"></div>
+                <div class="rpt-meta-row">
+                    <div class="rpt-meta-text">
+                        <strong class="sync-proj-name">Project: [Not Set]</strong><br>
+                        <span class="sync-proj-mgr">PM: [Not Set]</span><br>
+                        <span class="sync-proj-date">Date: [Not Set]</span>
+                    </div>
+                    <div class="rpt-logo"><img id="display-logo" src="https://logo.clearbit.com/adcoop.com" alt="Logo"></div>
+                </div>
+            </div>
+            <div class="dash-wrap" style="margin-bottom:16px;">
+                <div class="dash-card">
+                    <span class="dash-val" id="dash-total">0</span>
+                    <span class="dash-lbl">Total Snags Logged</span>
+                </div>
+            </div>
+            <div class="sec-lbl" style="margin-bottom:12px;">Snag Register</div>
+            <div id="snag-list"></div>
+        </div>
+
     </div>
 
     <script>
-        let snagData = [];
-        let snagCounter = 1;
-        let editingSnagId = null;
-        let hasUnsavedChanges = false; 
-        let currentRawImage = null; 
-        
-        let cropper = null;
-        const imageToEdit = document.getElementById('image-to-edit');
-        const canvas = document.getElementById('markup-canvas');
-        const ctx = canvas.getContext('2d');
-        let isDrawing = false;
-        let drawingBaseImage = new Image(); 
-        
-        // True Undo Stack
-        let undoStack = [];
+        let snagData=[], snagCounter=1, editingSnagId=null;
+        let hasUnsavedChanges=false, currentRawImage=null;
+        let cropper=null, isDrawing=false;
+        const imageToEdit=document.getElementById('image-to-edit');
+        const canvas=document.getElementById('markup-canvas');
+        const ctx=canvas.getContext('2d');
+        let drawingBaseImage=new Image(), undoStack=[];
 
-        window.addEventListener('beforeunload', function (e) {
-            if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = 'Unsaved changes.'; }
-        });
+        window.addEventListener('beforeunload',e=>{if(hasUnsavedChanges){e.preventDefault();e.returnValue='';}});
 
-        // XSS Vulnerability Fix
-        function escapeHTML(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
+        /* ── THEME ── */
+        function toggleTheme(){const h=document.documentElement,next=h.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(next);localStorage.setItem('snagTheme',next);}
+        function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('theme-icon').textContent=t==='dark'?'🌙':'☀️';document.getElementById('theme-label').textContent=t==='dark'?'Dark':'Light';}
 
-        // --- DRAG AND DROP UI LOGIC ---
-        const dropZone = document.getElementById('drop-zone');
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--action-color)';
-            dropZone.style.backgroundColor = '#eef2f5';
-        });
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--border-color)';
-            dropZone.style.backgroundColor = '#fdfdfd';
-        });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--border-color)';
-            dropZone.style.backgroundColor = '#fdfdfd';
-            if (e.dataTransfer.files.length > 0) {
-                document.getElementById('snag-photo').files = e.dataTransfer.files;
-                document.getElementById('snag-photo').dispatchEvent(new Event('change'));
-            }
-        });
+        /* ── XSS ── */
+        function escapeHTML(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 
-        document.getElementById('snag-photo').addEventListener('change', function(e) {
-            if (e.target.files.length === 0) {
-                resetEditorUI();
-                return;
-            }
-            const file = e.target.files[0];
-            const objectUrl = URL.createObjectURL(file); 
-            let img = new Image();
-            img.onload = function() {
-                let tempCanvas = document.createElement('canvas');
-                let tempCtx = tempCanvas.getContext('2d');
-                let MAX_DIMENSION = 1200;
-                let scale = Math.min(MAX_DIMENSION / img.width, MAX_DIMENSION / img.height, 1);
-                
-                tempCanvas.width = img.width * scale;
-                tempCanvas.height = img.height * scale;
-                
-                tempCtx.imageSmoothingEnabled = true;
-                tempCtx.imageSmoothingQuality = 'high';
-                tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
-                currentRawImage = tempCanvas.toDataURL('image/jpeg', 0.85); 
-                
-                document.getElementById('btn-markup').style.display = 'inline-block'; 
-                document.getElementById('markup-container').style.display = 'none'; 
-                URL.revokeObjectURL(objectUrl);
+        /* ── DRAG & DROP ── */
+        const dropZone=document.getElementById('drop-zone');
+        dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+        dropZone.addEventListener('dragleave',e=>{e.preventDefault();dropZone.classList.remove('drag-over');});
+        dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files.length){document.getElementById('snag-photo').files=e.dataTransfer.files;document.getElementById('snag-photo').dispatchEvent(new Event('change'));}});
+
+        document.getElementById('snag-photo').addEventListener('change',function(e){
+            if(!e.target.files.length){resetEditorUI();return;}
+            const url=URL.createObjectURL(e.target.files[0]);
+            const img=new Image();
+            img.onload=()=>{
+                const MAX=1200,scale=Math.min(MAX/img.width,MAX/img.height,1);
+                const tc=document.createElement('canvas');tc.width=img.width*scale;tc.height=img.height*scale;
+                const tx=tc.getContext('2d');tx.imageSmoothingEnabled=true;tx.imageSmoothingQuality='high';
+                tx.drawImage(img,0,0,tc.width,tc.height);
+                currentRawImage=tc.toDataURL('image/jpeg',0.85);
+                document.getElementById('btn-markup').style.display='inline-flex';
+                document.getElementById('markup-container').style.display='none';
+                URL.revokeObjectURL(url);
             };
-            img.src = objectUrl;
+            img.src=url;
         });
 
-        function showEditor() {
-            if (!currentRawImage) return;
-            document.getElementById('markup-container').style.display = 'block';
-            document.getElementById('cropper-stage').style.display = 'block';
-            document.getElementById('drawing-stage').style.display = 'none';
-            document.getElementById('btn-markup').style.display = 'none';
+        /* ── MARKUP EDITOR ── */
+        function showEditor(){if(!currentRawImage)return;document.getElementById('markup-container').style.display='block';document.getElementById('cropper-stage').style.display='block';document.getElementById('drawing-stage').style.display='none';document.getElementById('btn-markup').style.display='none';imageToEdit.src=currentRawImage;imageToEdit.onload=()=>{if(cropper)cropper.destroy();cropper=new Cropper(imageToEdit,{viewMode:1,dragMode:'move',autoCropArea:1,restore:false,guides:false,center:false,highlight:false,cropBoxMovable:true,cropBoxResizable:true,toggleDragModeOnDblclick:false});};}
+        function rotateImage(d){if(cropper)cropper.rotate(d);}
+        function applyEditsAndSwitchToDraw(){if(!cropper)return;const edited=cropper.getCroppedCanvas({maxWidth:1200,maxHeight:1200}).toDataURL('image/jpeg',0.85);document.getElementById('cropper-stage').style.display='none';document.getElementById('drawing-stage').style.display='block';drawingBaseImage.onload=()=>{const w=document.getElementById('markup-container').clientWidth,sc=Math.min(w/drawingBaseImage.width,1);canvas.width=drawingBaseImage.width*sc;canvas.height=drawingBaseImage.height*sc;ctx.drawImage(drawingBaseImage,0,0,canvas.width,canvas.height);cropper.destroy();cropper=null;undoStack=[];};drawingBaseImage.src=edited;}
+        function undoDrawing(){if(undoStack.length){const img=new Image();img.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0);};img.src=undoStack.pop();}else{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(drawingBaseImage,0,0,canvas.width,canvas.height);undoStack=[];}}
+        function getPos(e){const r=canvas.getBoundingClientRect(),cx=e.clientX||(e.touches&&e.touches[0].clientX),cy=e.clientY||(e.touches&&e.touches[0].clientY);return{x:(cx-r.left)*(canvas.width/r.width),y:(cy-r.top)*(canvas.height/r.height)};}
+        function startDraw(e){isDrawing=true;undoStack.push(canvas.toDataURL('image/jpeg',1));draw(e);}
+        function stopDraw(){isDrawing=false;ctx.beginPath();}
+        function draw(e){if(!isDrawing)return;e.preventDefault();const p=getPos(e);ctx.lineWidth=5;ctx.lineCap='round';ctx.strokeStyle=document.documentElement.getAttribute('data-theme')==='dark'?'#f04060':'#c02236';ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);}
+        canvas.addEventListener('mousedown',startDraw);canvas.addEventListener('mouseup',stopDraw);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseout',stopDraw);
+        canvas.addEventListener('touchstart',startDraw,{passive:false});canvas.addEventListener('touchend',stopDraw);canvas.addEventListener('touchmove',draw,{passive:false});
 
-            imageToEdit.src = currentRawImage;
-            imageToEdit.onload = function() {
-                if (cropper) { cropper.destroy(); }
-                cropper = new Cropper(imageToEdit, {
-                    viewMode: 1, dragMode: 'move', autoCropArea: 1,
-                    restore: false, guides: false, center: false, highlight: false,
-                    cropBoxMovable: true, cropBoxResizable: true, toggleDragModeOnDblclick: false,
-                });
-            };
+        function resetEditorUI(){currentRawImage=null;document.getElementById('btn-markup').style.display='none';document.getElementById('markup-container').style.display='none';document.getElementById('snag-photo').value='';undoStack=[];if(cropper){cropper.destroy();cropper=null;}}
+
+        /* ── REPORT HEADER ── */
+        function updateReportHeader(){
+            let rd=document.getElementById('proj-date').value,fd=rd;
+            if(rd){const p=rd.split('-');if(p.length===3)fd=`${p[2]}/${p[1]}/${p[0]}`;}
+            document.querySelectorAll('.sync-rpt-title').forEach(el=>el.innerText=document.getElementById('report-title').value);
+            document.querySelectorAll('.sync-proj-name').forEach(el=>el.innerText='Project: '+(document.getElementById('proj-name').value||'[Not Set]'));
+            document.querySelectorAll('.sync-proj-mgr').forEach(el=>el.innerText='PM: '+(document.getElementById('proj-manager').value||'[Not Set]'));
+            document.querySelectorAll('.sync-proj-date').forEach(el=>el.innerText='Date: '+(fd||'[Not Set]'));
+            const logo=document.getElementById('report-logo').value||'https://logo.clearbit.com/adcoop.com';
+            const el=document.getElementById('display-logo');if(el)el.src=logo;
+            hasUnsavedChanges=true;
         }
 
-        function rotateImage(deg) { if (cropper) cropper.rotate(deg); }
-
-        function applyEditsAndSwitchToDraw() {
-            if (!cropper) return;
-            const editedImageResult = cropper.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 }).toDataURL('image/jpeg', 0.85);
-            document.getElementById('cropper-stage').style.display = 'none';
-            document.getElementById('drawing-stage').style.display = 'block';
-
-            drawingBaseImage.onload = function() {
-                const containerWidth = document.getElementById('markup-container').clientWidth;
-                const scale = Math.min(containerWidth / drawingBaseImage.width, 1);
-                canvas.width = drawingBaseImage.width * scale;
-                canvas.height = drawingBaseImage.height * scale;
-                ctx.drawImage(drawingBaseImage, 0, 0, canvas.width, canvas.height);
-                cropper.destroy(); cropper = null;
-                undoStack = []; // Reset undo stack on new image
-            }
-            drawingBaseImage.src = editedImageResult;
+        /* ── ADD / EDIT ── */
+        function addSnag(){
+            const ci=document.getElementById('snag-comment');
+            if(!ci.value.trim()&&!currentRawImage){alert("Add a description or photo.");return;}
+            let img=null;
+            if(currentRawImage){if(document.getElementById('markup-container').style.display==='block'){if(document.getElementById('drawing-stage').style.display==='block'){img=canvas.toDataURL('image/jpeg',0.85);}else{alert("Click 'Apply & Draw' first.");return;}}else{img=currentRawImage;}}
+            if(editingSnagId!==null){snagData[editingSnagId-1].image=img;snagData[editingSnagId-1].comment=ci.value;editingSnagId=null;document.getElementById('btn-add-snag').innerText='+ Add Snag';}
+            else{snagData.push({id:snagCounter++,image:img,comment:ci.value});}
+            ci.value='';resetEditorUI();hasUnsavedChanges=true;renderSnags();
         }
 
-        // True Undo Implementation
-        function undoDrawing() {
-            if (undoStack.length > 0) {
-                let lastState = undoStack.pop();
-                let img = new Image();
-                img.onload = function() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-                }
-                img.src = lastState;
-            } else {
-                clearCanvas(); 
-            }
+        function editSnag(id){
+            const snag=snagData[id-1];document.getElementById('snag-comment').value=snag.comment||'';
+            if(snag.image){currentRawImage=snag.image;document.getElementById('markup-container').style.display='block';document.getElementById('cropper-stage').style.display='block';document.getElementById('drawing-stage').style.display='none';document.getElementById('btn-markup').style.display='none';imageToEdit.src=currentRawImage;imageToEdit.onload=()=>{if(cropper)cropper.destroy();cropper=new Cropper(imageToEdit,{viewMode:1,dragMode:'move',autoCropArea:1,restore:false,guides:false,center:false,highlight:false,cropBoxMovable:true,cropBoxResizable:true,toggleDragModeOnDblclick:false});};}
+            else{resetEditorUI();}
+            editingSnagId=id;document.getElementById('btn-add-snag').innerText='💾 Update Snag';
+            const panels=document.querySelectorAll('.panel.no-print');if(panels[1])window.scrollTo({top:panels[1].offsetTop-75,behavior:'smooth'});
         }
 
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(drawingBaseImage, 0, 0, canvas.width, canvas.height);
-            undoStack = [];
-        }
+        function deleteSnag(id){if(!confirm('Remove this snag?'))return;snagData.splice(id-1,1);snagData.forEach((s,i)=>s.id=i+1);snagCounter=snagData.length+1;hasUnsavedChanges=true;renderSnags();}
 
-        function getPos(evt) {
-            const rect = canvas.getBoundingClientRect();
-            const clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
-            const clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
-        }
-
-        function startDrawing(e) { 
-            isDrawing = true; 
-            undoStack.push(canvas.toDataURL('image/jpeg', 1.0)); // Save pre-stroke state
-            draw(e); 
-        }
-        function stopDrawing() { isDrawing = false; ctx.beginPath(); }
-        function draw(e) {
-            if (!isDrawing) return;
-            e.preventDefault(); 
-            const pos = getPos(e);
-            ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.strokeStyle = '#e74c3c'; 
-            ctx.lineTo(pos.x, pos.y); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
-        }
-
-        canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseout', stopDrawing);
-        canvas.addEventListener('touchstart', startDrawing, { passive: false });
-        canvas.addEventListener('touchend', stopDrawing); canvas.addEventListener('touchmove', draw, { passive: false });
-
-        function resetEditorUI() {
-             currentRawImage = null;
-             document.getElementById('btn-markup').style.display = 'none';
-             document.getElementById('markup-container').style.display = 'none';
-             document.getElementById('snag-photo').value = '';
-             undoStack = [];
-             if(cropper) { cropper.destroy(); cropper = null; }
-        }
-
-        function updateReportHeader() {
-            let rawDate = document.getElementById('proj-date').value;
-            let formattedDate = rawDate;
-            if (rawDate) {
-                const parts = rawDate.split('-');
-                if (parts.length === 3) formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            
-            const titleStr = document.getElementById('report-title').value;
-            const pNameStr = 'Project: ' + (document.getElementById('proj-name').value || '[Not Set]');
-            const pMgrStr = 'PM: ' + (document.getElementById('proj-manager').value || '[Not Set]');
-            const pDateStr = 'Date: ' + (formattedDate || '[Not Set]');
-            const logoUrl = document.getElementById('report-logo').value || 'https://logo.clearbit.com/adcoop.com';
-
-            document.querySelectorAll('.sync-report-title').forEach(el => el.innerText = titleStr);
-            document.querySelectorAll('.sync-proj-name').forEach(el => el.innerText = pNameStr);
-            document.querySelectorAll('.sync-proj-manager').forEach(el => el.innerText = pMgrStr);
-            document.querySelectorAll('.sync-proj-date').forEach(el => el.innerText = pDateStr);
-            
-            const displayLogo = document.getElementById('display-report-logo');
-            if (displayLogo) displayLogo.src = logoUrl;
-            
-            hasUnsavedChanges = true;
-        }
-
-        function updateDashboard() {
-            const total = snagData.length;
-            const open = snagData.filter(s => s.status === 'Open').length;
-            const prog = snagData.filter(s => s.status === 'In Progress').length;
-            const closed = snagData.filter(s => s.status === 'Closed').length;
-
-            document.getElementById('dash-total-val').innerText = total;
-            document.getElementById('dash-open-val').innerText = open;
-            document.getElementById('dash-prog-val').innerText = prog;
-            document.getElementById('dash-closed-val').innerText = closed;
-        }
-
-        function addSnag() {
-            const commentInput = document.getElementById('snag-comment');
-            const locInput = document.getElementById('snag-location');
-            const ownerInput = document.getElementById('snag-owner');
-            const dueInput = document.getElementById('snag-due');
-            const priorityInput = document.getElementById('snag-priority');
-            const statusInput = document.getElementById('snag-status');
-
-            // Bug Fix: Validation
-            if (!commentInput.value.trim() && !locInput.value.trim() && !currentRawImage) {
-                alert("Please provide at least a location, description, or photo to create a snag.");
-                return;
-            }
-
-            let finalImageToSave = null; 
-
-            if (currentRawImage) {
-                if (document.getElementById('markup-container').style.display === 'block') {
-                     if(document.getElementById('drawing-stage').style.display === 'block') {
-                         finalImageToSave = canvas.toDataURL('image/jpeg', 0.85);
-                     } else {
-                         alert("Please click 'Apply Edits & Draw' before adding the snag."); return;
-                     }
-                } else { 
-                     finalImageToSave = currentRawImage; 
-                }
-            }
-            
-            if (editingSnagId !== null) {
-                // Update Existing
-                const indexToUpdate = editingSnagId - 1;
-                snagData[indexToUpdate].image = finalImageToSave;
-                snagData[indexToUpdate].comment = commentInput.value;
-                snagData[indexToUpdate].location = locInput.value;
-                snagData[indexToUpdate].owner = ownerInput.value;
-                snagData[indexToUpdate].due = dueInput.value;
-                snagData[indexToUpdate].priority = priorityInput.value;
-                snagData[indexToUpdate].status = statusInput.value;
-                
-                editingSnagId = null;
-                document.getElementById('btn-add-snag').innerText = '+ Add Snag';
-            } else {
-                // Add New
-                snagData.push({ 
-                    id: snagCounter++, 
-                    image: finalImageToSave, 
-                    comment: commentInput.value,
-                    location: locInput.value,
-                    owner: ownerInput.value,
-                    due: dueInput.value,
-                    priority: priorityInput.value,
-                    status: statusInput.value
-                });
-            }
-
-            resetEditorUI(); 
-            commentInput.value = '';
-            locInput.value = '';
-            ownerInput.value = '';
-            dueInput.value = '';
-            priorityInput.value = 'Medium';
-            statusInput.value = 'Open';
-
-            hasUnsavedChanges = true; 
-            renderSnags();
-        }
-
-        // Bug Fix: Edit Existing Snag
-        function editSnag(id) {
-            const index = id - 1;
-            const snag = snagData[index];
-            document.getElementById('snag-location').value = snag.location || '';
-            document.getElementById('snag-owner').value = snag.owner || '';
-            document.getElementById('snag-due').value = snag.due || '';
-            document.getElementById('snag-status').value = snag.status || 'Open';
-            document.getElementById('snag-priority').value = snag.priority || 'Medium';
-            document.getElementById('snag-comment').value = snag.comment || '';
-            
-            if (snag.image) {
-                currentRawImage = snag.image;
-                document.getElementById('markup-container').style.display = 'block';
-                document.getElementById('cropper-stage').style.display = 'block';
-                document.getElementById('drawing-stage').style.display = 'none';
-                document.getElementById('btn-markup').style.display = 'none';
-                
-                imageToEdit.src = currentRawImage;
-                imageToEdit.onload = function() {
-                    if (cropper) cropper.destroy();
-                    cropper = new Cropper(imageToEdit, {
-                        viewMode: 1, dragMode: 'move', autoCropArea: 1,
-                        restore: false, guides: false, center: false, highlight: false,
-                        cropBoxMovable: true, cropBoxResizable: true, toggleDragModeOnDblclick: false,
-                    });
-                };
-            } else {
-                resetEditorUI();
-            }
-            
-            editingSnagId = id;
-            document.getElementById('btn-add-snag').innerText = '💾 Update Snag';
-            window.scrollTo(0, document.querySelector('.panel.no-print').offsetTop);
-        }
-
-        function updateSnagStatus(id, newStatus) {
-            snagData[id - 1].status = newStatus;
-            hasUnsavedChanges = true;
-            renderSnags(); 
-        }
-
-        // Bug Fix: No gaps in IDs upon deletion
-        function deleteSnag(id) { 
-            snagData.splice(id - 1, 1); 
-            snagData.forEach((snag, i) => { snag.id = i + 1; });
-            snagCounter = snagData.length + 1;
-            hasUnsavedChanges = true; 
-            renderSnags(); 
-        }
-
-        function renderSnags() {
-            const listContainer = document.getElementById('snag-list');
-            const prefix = document.getElementById('report-prefix').value || 'ADCOOP-SN';
-            
-            // Search Filters
-            const filterText = document.getElementById('filter-text').value.toLowerCase();
-            const filterStatus = document.getElementById('filter-status-view').value;
-            const filterPriority = document.getElementById('filter-priority-view').value;
-
-            let batchedHTML = ''; 
-            
-            snagData.forEach((snag) => {
-                // Apply Filters
-                if (filterStatus !== 'All' && snag.status !== filterStatus) return;
-                if (filterPriority !== 'All' && snag.priority !== filterPriority) return;
-                if (filterText) {
-                    const searchStr = `${snag.location || ''} ${snag.owner || ''} ${snag.comment || ''}`.toLowerCase();
-                    if (!searchStr.includes(filterText)) return;
-                }
-
-                let imageContent = snag.image 
-                    ? `<img src="${snag.image}" alt="Snag Photo" class="snag-photo">` 
-                    : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #95a5a6; font-weight: bold; font-size: 14px; text-align: center; padding: 10px;">NO IMAGE</div>`;
-
-                let badgeColor = "#e74c3c"; // Red
-                if (snag.status === "In Progress") badgeColor = "#e67e22"; // Orange
-                if (snag.status === "Closed") badgeColor = "#27ae60"; // Green
-
-                let prioColor = "#95a5a6";
-                if (snag.priority === "High") prioColor = "#c0392b";
-                if (snag.priority === "Medium") prioColor = "#f39c12";
-                if (snag.priority === "Low") prioColor = "#27ae60";
-                
-                // Overdue logic
-                let overdueHTML = "";
-                if (snag.due && snag.status !== "Closed") {
-                    const dueDate = new Date(snag.due);
-                    const today = new Date();
-                    today.setHours(0,0,0,0);
-                    if (dueDate < today) {
-                        overdueHTML = `<span class="status-badge" style="background-color: #000; margin-left: 5px;">⚠️ OVERDUE</span>`;
-                    }
-                }
-
-                let formattedID = `${escapeHTML(prefix)}-${String(snag.id).padStart(3, '0')}`;
-                
-                // XSS Fix applied to renders
-                let safeLocation = escapeHTML(snag.location || 'N/A');
-                let safeOwner = escapeHTML(snag.owner || 'N/A');
-                let safeDue = escapeHTML(snag.due || 'N/A');
-                let safeComment = escapeHTML(snag.comment || '').replace(/\n/g, '<br>');
-
-                batchedHTML += `
-                    <div class="snag-item">
-                        <div class="snag-photo-wrapper">
-                            ${imageContent}
-                        </div>
-                        <div class="snag-details">
-                            <div class="snag-id">
-                                ${formattedID}
-                                <span class="status-badge" style="background-color: ${badgeColor};">${escapeHTML(snag.status)}</span>
-                                <span class="status-badge" style="background-color: ${prioColor};">${escapeHTML(snag.priority || 'Medium')} Prio</span>
-                                ${overdueHTML}
-                            </div>
-                            <p><strong>Location:</strong> ${safeLocation}</p>
-                            <p><strong>Responsible:</strong> ${safeOwner}</p>
-                            <p><strong>Due Date:</strong> ${safeDue}</p>
-                            <p style="margin-top: 6px;"><strong>Description:</strong> ${safeComment}</p>
-                            
-                            <div class="delete-btn-container no-print">
-                                <select onchange="updateSnagStatus(${snag.id}, this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); margin-right: 10px; font-size: 0.9em; width: auto; display: inline-block;">
-                                    <option value="Open" ${snag.status === 'Open' ? 'selected' : ''}>Open</option>
-                                    <option value="In Progress" ${snag.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                                    <option value="Closed" ${snag.status === 'Closed' ? 'selected' : ''}>Closed</option>
-                                </select>
-                                <button class="btn btn-edit" onclick="editSnag(${snag.id})" style="padding: 5px 10px; font-size: 0.85em; margin-right: 5px;">Edit</button>
-                                <button class="btn btn-danger" onclick="deleteSnag(${snag.id})" style="padding: 5px 10px; font-size: 0.85em;">Remove</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+        /* ── RENDER ── */
+        function renderSnags(){
+            const lc=document.getElementById('snag-list');
+            const prefix=document.getElementById('report-prefix').value||'ADCOOP-SN';
+            const ft=document.getElementById('filter-text').value.toLowerCase();
+            let html='';
+            snagData.forEach(s=>{
+                if(ft&&!(s.comment||'').toLowerCase().includes(ft))return;
+                const ref=`${escapeHTML(prefix)}-${String(s.id).padStart(3,'0')}`;
+                const safe=escapeHTML(s.comment||'').replace(/\n/g,'<br>');
+                const imgH=s.image?`<img src="${s.image}" alt="Snag Photo" class="snag-photo">`:`<div class="no-img">NO IMAGE</div>`;
+                html+=`<div class="snag-item"><div class="snag-photo-wrap">${imgH}</div><div class="snag-body"><div class="snag-top"><span class="snag-ref">${ref}</span></div><div class="snag-desc">${safe||'<em style="color:var(--text-muted)">No description provided.</em>'}</div><div class="snag-acts no-print"><button class="btn btn-edit" onclick="editSnag(${s.id})">✏️ Edit</button><button class="btn btn-danger" onclick="deleteSnag(${s.id})">🗑 Remove</button></div></div></div>`;
             });
-            
-            listContainer.innerHTML = batchedHTML; 
-            updateDashboard();
-            updateReportHeader(); 
+            lc.innerHTML=html||`<div style="text-align:center;padding:38px;color:var(--text-muted);font-family:var(--mono);font-size:0.82em;letter-spacing:1px;">NO SNAGS LOGGED YET</div>`;
+            document.getElementById('dash-total').innerText=snagData.length;
         }
 
-        function saveData() {
-            const projectData = {
-                reportTitle: document.getElementById('report-title').value,
-                projName: document.getElementById('proj-name').value,
-                projDate: document.getElementById('proj-date').value,
-                projManager: document.getElementById('proj-manager').value,
-                reportPrefix: document.getElementById('report-prefix').value,
-                reportLogo: document.getElementById('report-logo').value,
-                snags: snagData, 
-                counter: snagCounter
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", (projectData.projName || "project") + "_snags.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click(); downloadAnchorNode.remove();
-            hasUnsavedChanges = false;
-            localStorage.removeItem("snagProject"); // Clean local storage on manual save
-        }
+        /* ── SAVE / LOAD ── */
+        function saveData(){const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};const a=document.createElement('a');a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d));a.download=(d.projName||'project')+'_snags.json';document.body.appendChild(a);a.click();a.remove();hasUnsavedChanges=false;localStorage.removeItem("snagProject");}
+        function loadData(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});updateReportHeader();snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();hasUnsavedChanges=false;event.target.value='';}catch(err){alert("Error loading file.");}};r.readAsText(file);}
 
-        function loadData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const loadedData = JSON.parse(e.target.result);
-                    document.getElementById('report-title').value = loadedData.reportTitle || '';
-                    document.getElementById('proj-name').value = loadedData.projName || '';
-                    document.getElementById('proj-date').value = loadedData.projDate || '';
-                    document.getElementById('proj-manager').value = loadedData.projManager || '';
-                    document.getElementById('report-prefix').value = loadedData.reportPrefix || 'ADCOOP-SN';
-                    document.getElementById('report-logo').value = loadedData.reportLogo || 'https://logo.clearbit.com/adcoop.com';
-                    updateReportHeader();
-                    snagData = loadedData.snags || []; 
-                    snagCounter = loadedData.counter || 1; 
-                    renderSnags();
-                    hasUnsavedChanges = false; event.target.value = '';
-                } catch (err) { alert("Error loading file."); }
-            };
-            reader.readAsText(file);
-        }
+        /* ── PDF EXPORT (RESTORED TO SAFE, ALIGNED BASELINE) ── */
+        function exportPDF(){
+            const ti=document.getElementById('report-title');
+            if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
 
-        function exportPDF() {
-            const titleInput = document.getElementById('report-title');
-            if (!titleInput.value.trim()) {
-                const userTitle = prompt("Report Title is blank. Please enter a title or click OK to proceed anyway:", "");
-                if (userTitle === null) return; 
-                titleInput.value = userTitle.trim();
-                updateReportHeader();
-            }
+            window.scrollTo(0, 0);
 
-            const removeBtns = document.querySelectorAll('.no-print');
-            removeBtns.forEach(btn => btn.style.display = 'none');
-            const container = document.getElementById('report-container');
+            document.querySelectorAll('.no-print').forEach(el=>el.style.display='none');
+            const container=document.getElementById('report-container');
             container.classList.add('pdf-export-mode');
 
-            const opt = {
-                margin:       [0.8, 0.5, 0.5, 0.5], 
-                filename:     (document.getElementById('proj-name').value || 'Snag_Report') + '.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true,
-                    letterRendering: true,
-                    backgroundColor: "#ffffff"
+            const opt={
+                // Top margin reduced to 0.2 to pull report perfectly to the top of the page
+                margin:[0.2, 0.5, 0.5, 0.5],
+                filename:(document.getElementById('proj-name').value||'Snag_Report')+'.pdf',
+                image:{type:'jpeg',quality:0.98},
+                html2canvas:{
+                    scale:2,
+                    useCORS:true,
+                    letterRendering:true,
+                    backgroundColor:'#ffffff'
                 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
+                jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
             };
 
-            html2pdf().set(opt).from(container).toPdf().get('pdf').then(function (pdf) {
-                const totalPages = pdf.internal.getNumberOfPages();
-                
-                const reportTitleText = document.getElementById('report-title').value;
-                const projName = document.getElementById('proj-name').value || '[Not Set]';
-                const projPM = document.getElementById('proj-manager').value || '[Not Set]';
-                const dateElement = document.querySelector('.sync-proj-date');
-                const dateText = dateElement ? dateElement.innerText.replace('Date: ', '') : '[Not Set]';
-
-                for (let i = 1; i <= totalPages; i++) {
+            html2pdf().set(opt).from(container).toPdf().get('pdf').then(function(pdf){
+                const n=pdf.internal.getNumberOfPages();
+                const title=ti.value, proj=document.getElementById('proj-name').value||'[Not Set]', pm=document.getElementById('proj-manager').value||'[Not Set]';
+                const dateEl=document.querySelector('.sync-proj-date'), dt=dateEl?dateEl.innerText.replace('Date: ',''):'[Not Set]';
+                for(let i=1;i<=n;i++){
                     pdf.setPage(i);
-                    
-                    if (i > 1) {
-                        pdf.setFontSize(11);
-                        pdf.setTextColor(44, 62, 80);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.text(reportTitleText.toUpperCase(), 0.5, 0.4);
-                        
-                        pdf.setFontSize(9);
-                        pdf.setFont('helvetica', 'normal');
-                        pdf.text(`Project: ${projName}   |   PM: ${projPM}   |   Date: ${dateText}`, 0.5, 0.55);
-                        
-                        pdf.setDrawColor(189, 195, 199);
-                        pdf.setLineWidth(0.01);
-                        pdf.line(0.5, 0.65, pdf.internal.pageSize.getWidth() - 0.5, 0.65);
+                    if(i>1){
+                        pdf.setFontSize(11);pdf.setTextColor(44,62,80);pdf.setFont('helvetica','bold');
+                        pdf.text(title.toUpperCase(),0.5,0.4);
+                        pdf.setFontSize(9);pdf.setFont('helvetica','normal');
+                        pdf.text(`Project: ${proj}   |   PM: ${pm}   |   Date: ${dt}`,0.5,0.55);
+                        pdf.setDrawColor(212,196,168);pdf.setLineWidth(0.01);
+                        pdf.line(0.5,0.65,pdf.internal.pageSize.getWidth()-0.5,0.65);
                     }
-
-                    pdf.setFontSize(10); 
-                    pdf.setTextColor(100);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.text('Page ' + i + ' of ' + totalPages, (pdf.internal.pageSize.getWidth() / 2), (pdf.internal.pageSize.getHeight() - 0.2), { align: 'center' });
+                    pdf.setFontSize(10);pdf.setTextColor(100);pdf.setFont('helvetica','normal');
+                    pdf.text('Page '+i+' of '+n,pdf.internal.pageSize.getWidth()/2,pdf.internal.pageSize.getHeight()-0.2,{align:'center'});
                 }
-            }).save().then(() => {
+            }).save().then(()=>{
                 container.classList.remove('pdf-export-mode');
-                removeBtns.forEach(btn => btn.style.display = '');
+                document.querySelectorAll('.no-print').forEach(el=>el.style.display='');
             });
         }
 
-        async function exportExcel() {
-            const titleInput = document.getElementById('report-title');
-            if (!titleInput.value.trim()) {
-                const userTitle = prompt("Report Title is blank. Please enter a title or click OK to proceed anyway:", "");
-                if (userTitle === null) return; 
-                titleInput.value = userTitle.trim();
-                updateReportHeader();
-            }
-
-            const reportTitleText = document.getElementById('report-title').value;
-            const projName = document.getElementById('proj-name').value || 'N/A';
-            const projDate = document.getElementById('proj-date').value || 'N/A';
-            const projManager = document.getElementById('proj-manager').value || 'N/A';
-            const prefix = document.getElementById('report-prefix').value || 'ADCOOP-SN';
-            
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Snag List');
-
-            worksheet.addRow([reportTitleText.toUpperCase()]);
-            worksheet.addRow(["Project:", projName, "Date:", projDate]);
-            worksheet.addRow(["Manager:", projManager]);
-            worksheet.addRow([]); 
-            
-            // Excel Export Summary Dashboard Fix
-            const total = snagData.length;
-            const open = snagData.filter(s => s.status === 'Open').length;
-            const prog = snagData.filter(s => s.status === 'In Progress').length;
-            const closed = snagData.filter(s => s.status === 'Closed').length;
-            
-            worksheet.addRow(["Dashboard Summary", `Total: ${total}`, `Open: ${open}`, `In Progress: ${prog}`, `Closed: ${closed}`]);
-            worksheet.addRow([]);
-            
-            const headerRow = worksheet.addRow(["Ref ID", "Photo", "Location", "Responsible", "Due Date", "Priority", "Status", "Defect Description / Comments"]);
-            headerRow.font = { bold: true };
-
-            worksheet.columns = [
-                { width: 15 },  
-                { width: 25 },  
-                { width: 20 },  
-                { width: 20 },  
-                { width: 15 },  
-                { width: 15 },  
-                { width: 15 },  
-                { width: 50 }   
-            ];
-
-            let currentRow = 8; // Offset for new summary rows
-
-            // Respect the active filters for Excel Export!
-            const filterText = document.getElementById('filter-text').value.toLowerCase();
-            const filterStatus = document.getElementById('filter-status-view').value;
-            const filterPriority = document.getElementById('filter-priority-view').value;
-
-            snagData.forEach((snag) => {
-                if (filterStatus !== 'All' && snag.status !== filterStatus) return;
-                if (filterPriority !== 'All' && snag.priority !== filterPriority) return;
-                if (filterText) {
-                    const searchStr = `${snag.location || ''} ${snag.owner || ''} ${snag.comment || ''}`.toLowerCase();
-                    if (!searchStr.includes(filterText)) return;
-                }
-
-                let formattedID = `${prefix}-${String(snag.id).padStart(3, '0')}`;
-                
-                const row = worksheet.addRow([
-                    formattedID, 
-                    "", 
-                    snag.location || 'N/A', 
-                    snag.owner || 'N/A', 
-                    snag.due || 'N/A', 
-                    snag.priority || 'Medium',
-                    snag.status || 'Open', 
-                    snag.comment
-                ]);
-
-                row.height = 90; 
-                row.alignment = { vertical: 'middle', wrapText: true };
-
-                // Status Column Coloring Fix
-                const statusCell = row.getCell(7);
-                statusCell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
-                if (snag.status === 'Open') {
-                    statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE74C3C' } };
-                } else if (snag.status === 'In Progress') {
-                    statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE67E22' } };
-                } else if (snag.status === 'Closed') {
-                    statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF27AE60' } };
-                }
-
-                // PNG Extension Check Fix
-                if (snag.image) {
-                    const base64Data = snag.image.split(',')[1];
-                    const imgExt = snag.image.includes("png") ? "png" : "jpeg"; 
-                    const imageId = workbook.addImage({
-                        base64: base64Data,
-                        extension: imgExt,
-                    });
-
-                    worksheet.addImage(imageId, {
-                        tl: { col: 1.1, row: currentRow - 1 + 0.1 }, 
-                        ext: { width: 140, height: 100 }
-                    });
-                }
-                
-                currentRow++;
+        /* ── EXCEL ── */
+        async function exportExcel(){
+            const ti=document.getElementById('report-title');if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
+            const title=ti.value,projName=document.getElementById('proj-name').value||'N/A',projDate=document.getElementById('proj-date').value||'N/A',projManager=document.getElementById('proj-manager').value||'N/A',prefix=document.getElementById('report-prefix').value||'ADCOOP-SN';
+            const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Snag List');
+            ws.addRow([title.toUpperCase()]);ws.addRow(["Project:",projName,"Date:",projDate]);ws.addRow(["Manager:",projManager]);ws.addRow([]);ws.addRow(["Summary",`Total Snags: ${snagData.length}`]);ws.addRow([]);
+            const hr=ws.addRow(["Ref ID","Photo","Defect Description / Comments"]);hr.font={bold:true};ws.columns=[{width:15},{width:25},{width:70}];
+            const ft=document.getElementById('filter-text').value.toLowerCase();let row=8;
+            snagData.forEach(s=>{
+                if(ft&&!(s.comment||'').toLowerCase().includes(ft))return;
+                const ref=`${prefix}-${String(s.id).padStart(3,'0')}`;
+                const r=ws.addRow([ref,"",s.comment||'']);r.height=90;r.alignment={vertical:'middle',wrapText:true};
+                if(s.image){const b64=s.image.split(',')[1],ext=s.image.includes("png")?"png":"jpeg",imgId=wb.addImage({base64:b64,extension:ext});ws.addImage(imgId,{tl:{col:1.1,row:row-1+0.1},ext:{width:140,height:100}});}
+                row++;
             });
-            
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.href = URL.createObjectURL(blob);
-            downloadAnchorNode.download = (projName !== 'N/A' && projName !== '' ? projName : 'Project') + "_Snags.xlsx";
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-        
-        // --- AUTO-SAVE LOGIC ---
-        function autoSave() {
-            if (!hasUnsavedChanges && snagData.length === 0) return;
-            const projectData = {
-                reportTitle: document.getElementById('report-title').value,
-                projName: document.getElementById('proj-name').value,
-                projDate: document.getElementById('proj-date').value,
-                projManager: document.getElementById('proj-manager').value,
-                reportPrefix: document.getElementById('report-prefix').value,
-                reportLogo: document.getElementById('report-logo').value,
-                snags: snagData,
-                counter: snagCounter
-            };
-            localStorage.setItem("snagProject", JSON.stringify(projectData));
-            hasUnsavedChanges = false;
+            const buf=await wb.xlsx.writeBuffer();
+            const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));a.download=(projName!=='N/A'?projName:'Project')+"_Snags.xlsx";document.body.appendChild(a);a.click();a.remove();
         }
 
-        setInterval(autoSave, 5000);
+        /* ── AUTO-SAVE ── */
+        function autoSave(){if(!hasUnsavedChanges&&snagData.length===0)return;const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};localStorage.setItem("snagProject",JSON.stringify(d));hasUnsavedChanges=false;}
+        setInterval(autoSave,5000);
 
-        window.onload = function() {
-            let saved = localStorage.getItem("snagProject");
+        /* ── INIT ── */
+        window.onload=function(){
+            applyTheme(localStorage.getItem('snagTheme')||'light');
+            const saved=localStorage.getItem("snagProject");
             if(saved){
-                if (confirm("Found an unsaved session. Would you like to restore it?")) {
-                    let data = JSON.parse(saved);
-                    document.getElementById('report-title').value = data.reportTitle || '';
-                    document.getElementById('proj-name').value = data.projName || '';
-                    document.getElementById('proj-date').value = data.projDate || '';
-                    document.getElementById('proj-manager').value = data.projManager || '';
-                    document.getElementById('report-prefix').value = data.reportPrefix || 'ADCOOP-SN';
-                    document.getElementById('report-logo').value = data.reportLogo || 'https://logo.clearbit.com/adcoop.com';
-                    
-                    snagData = data.snags || [];
-                    snagCounter = data.counter || 1;
-                    
-                    renderSnags();
-                    updateReportHeader();
-                } else {
-                    localStorage.removeItem("snagProject");
-                    updateReportHeader();
-                }
-            } else {
-                updateReportHeader();
-            }
+                if(confirm("Found an unsaved session. Restore it?")){
+                    const d=JSON.parse(saved);
+                    ['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});
+                    snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();updateReportHeader();
+                }else{localStorage.removeItem("snagProject");updateReportHeader();}
+            }else{updateReportHeader();}
         };
-
-        // --- PWA SERVICE WORKER REGISTRATION ---
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => {
-                console.log('Service worker registration failed:', err);
-            });
-        }
-
+        if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
     </script>
 </body>
 </html>
