@@ -213,10 +213,14 @@
 
         /* ── RESPONSIVE (Placed BEFORE PDF Rules so PDF overrides it) ── */
         @media (max-width:700px) {
-            .app-header { padding:0 11px; }
+            .app-header { padding:10px 11px; height:auto; flex-wrap:wrap; gap:10px; }
+            .header-right { width:100%; flex-wrap:wrap; justify-content:flex-end; }
+            .theme-pill { margin-right:auto; margin-bottom:8px; }
+            .header-actions { width:100%; display:flex; justify-content:space-between; gap:5px; }
+            .btn-hdr { flex:1; justify-content:center; padding:8px 2px; font-size:0.75em; }
             .tp-label { display:none; }
             .main-layout { padding:11px 10px; }
-            .g3, .g4 { grid-template-columns:1fr; }
+            .g3, .g4, .g5 { grid-template-columns:1fr; }
             .snag-item { flex-direction:column; }
             .snag-photo-wrap { width:100%; min-width:unset; height:155px; border-right:none; border-bottom:1px solid var(--border); }
             #cropper-wrapper { height:250px; }
@@ -230,7 +234,7 @@
             max-width: 760px !important;
             min-width: 760px !important;
             margin: 0 auto !important;
-            padding: 0 10px 10px 10px !important; /* Top padding removed so it sits flush to margin */
+            padding: 0 10px 10px 10px !important;
             background-color: #fff !important;
             color: #222 !important;
             box-sizing: border-box !important;
@@ -242,7 +246,7 @@
             border-radius: 4px !important;
             box-shadow: none !important;
             padding: 16px !important;
-            margin-top: 0 !important; /* Forces top alignment */
+            margin-top: 0 !important;
             margin-bottom: 16px !important;
             width: 100% !important;
             box-sizing: border-box !important;
@@ -332,7 +336,7 @@
         .pdf-export-mode .snag-ref { color: #9a6800 !important; font-size: 13px !important; }
         .pdf-export-mode .snag-desc {
             color: #2a1f0e !important;
-            font-size: 11px !important;
+            font-size: 15px !important; /* INCREASED FONT SIZE HERE */
             line-height: 1.55 !important;
             word-wrap: break-word !important;
             overflow-wrap: break-word !important;
@@ -568,7 +572,7 @@
         function saveData(){const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};const a=document.createElement('a');a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d));a.download=(d.projName||'project')+'_snags.json';document.body.appendChild(a);a.click();a.remove();hasUnsavedChanges=false;localStorage.removeItem("snagProject");}
         function loadData(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});updateReportHeader();snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();hasUnsavedChanges=false;event.target.value='';}catch(err){alert("Error loading file.");}};r.readAsText(file);}
 
-        /* ── PDF EXPORT (RESTORED TO SAFE, ALIGNED BASELINE) ── */
+        /* ── EXPORT PDF ── */
         function exportPDF(){
             const ti=document.getElementById('report-title');
             if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
@@ -580,7 +584,6 @@
             container.classList.add('pdf-export-mode');
 
             const opt={
-                // Top margin reduced to 0.2 to pull report perfectly to the top of the page
                 margin:[0.2, 0.5, 0.5, 0.5],
                 filename:(document.getElementById('proj-name').value||'Snag_Report')+'.pdf',
                 image:{type:'jpeg',quality:0.98},
