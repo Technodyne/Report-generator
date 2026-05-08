@@ -172,8 +172,8 @@
         .filter-bar input { background:var(--bg-input); flex:1; }
 
         /* ── DROP ZONE ── */
-        .drop-zone { border:2px dashed var(--border); border-radius:6px; padding:22px; text-align:center; background:var(--drop-bg); cursor:pointer; transition:all .25s; margin-bottom:13px; display:block; }
-        .drop-zone:hover, .drop-zone.drag-over { border-color:var(--accent); background:var(--accent-glow); }
+        .drop-zone { border:2px dashed var(--border); border-radius:6px; padding:22px; text-align:center; background:var(--drop-bg); transition:all .25s; margin-bottom:13px; display:block; }
+        .drop-zone.drag-over { border-color:var(--accent); background:var(--accent-glow); }
         .dz-icon { font-size:1.7em; display:block; margin-bottom:7px; }
         .dz-text { font-size:0.87em; color:var(--text-sec); display:block; }
         .dz-sub  { font-size:0.74em; color:var(--text-muted); display:block; margin-top:3px; }
@@ -220,7 +220,7 @@
             .btn-hdr { flex:1; justify-content:center; padding:8px 2px; font-size:0.75em; }
             .tp-label { display:none; }
             .main-layout { padding:11px 10px; }
-            .g3, .g4, .g5 { grid-template-columns:1fr; }
+            .g3, .g4 { grid-template-columns:1fr; }
             .snag-item { flex-direction:column; }
             .snag-photo-wrap { width:100%; min-width:unset; height:155px; border-right:none; border-bottom:1px solid var(--border); }
             #cropper-wrapper { height:250px; }
@@ -234,7 +234,7 @@
             max-width: 760px !important;
             min-width: 760px !important;
             margin: 0 auto !important;
-            padding: 0 10px 10px 10px !important;
+            padding: 0 10px 10px 10px !important; 
             background-color: #fff !important;
             color: #222 !important;
             box-sizing: border-box !important;
@@ -246,7 +246,7 @@
             border-radius: 4px !important;
             box-shadow: none !important;
             padding: 16px !important;
-            margin-top: 0 !important;
+            margin-top: 0 !important; 
             margin-bottom: 16px !important;
             width: 100% !important;
             box-sizing: border-box !important;
@@ -402,12 +402,26 @@
             </div>
             <div class="panel-body">
                 <div class="sec-lbl">Photo</div>
-                <label for="snag-photo" id="drop-zone" class="drop-zone">
+                
+                <div id="drop-zone" class="drop-zone">
                     <span class="dz-icon">📷</span>
                     <span class="dz-text">Drag &amp; Drop Photo Here</span>
-                    <span class="dz-sub">or click to browse &nbsp;·&nbsp; Optional</span>
+                    <span class="dz-sub" style="margin-bottom: 12px; display: block;">or choose an upload method</span>
+                    
+                    <div style="display: flex; justify-content: center; gap: 10px; position: relative; z-index: 5;">
+                        <label class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85em; cursor: pointer; margin: 0;">
+                            📸 Camera
+                            <input type="file" id="snag-photo-cam" accept="image/*" capture="environment" style="display:none;">
+                        </label>
+                        <label class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85em; cursor: pointer; margin: 0;">
+                            🖼️ Gallery
+                            <input type="file" id="snag-photo-gal" accept="image/*" style="display:none;">
+                        </label>
+                    </div>
+                    
                     <input type="file" id="snag-photo" accept="image/*" style="display:none;">
-                </label>
+                </div>
+
                 <button class="btn btn-markup" id="btn-markup" style="display:none;margin-bottom:13px;" onclick="showEditor()">✏️ Edit &amp; Markup Photo</button>
                 <div id="markup-container">
                     <div id="cropper-stage">
@@ -486,7 +500,8 @@
         dropZone.addEventListener('dragleave',e=>{e.preventDefault();dropZone.classList.remove('drag-over');});
         dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files.length){document.getElementById('snag-photo').files=e.dataTransfer.files;document.getElementById('snag-photo').dispatchEvent(new Event('change'));}});
 
-        document.getElementById('snag-photo').addEventListener('change',function(e){
+        /* ── PHOTO UPLOAD LOGIC ── */
+        const processPhoto = function(e) {
             if(!e.target.files.length){resetEditorUI();return;}
             const url=URL.createObjectURL(e.target.files[0]);
             const img=new Image();
@@ -501,7 +516,12 @@
                 URL.revokeObjectURL(url);
             };
             img.src=url;
-        });
+            e.target.value = ''; // Reset input to allow re-uploading same file
+        };
+
+        document.getElementById('snag-photo').addEventListener('change', processPhoto);
+        document.getElementById('snag-photo-cam').addEventListener('change', processPhoto);
+        document.getElementById('snag-photo-gal').addEventListener('change', processPhoto);
 
         /* ── MARKUP EDITOR ── */
         function showEditor(){if(!currentRawImage)return;document.getElementById('markup-container').style.display='block';document.getElementById('cropper-stage').style.display='block';document.getElementById('drawing-stage').style.display='none';document.getElementById('btn-markup').style.display='none';imageToEdit.src=currentRawImage;imageToEdit.onload=()=>{if(cropper)cropper.destroy();cropper=new Cropper(imageToEdit,{viewMode:1,dragMode:'move',autoCropArea:1,restore:false,guides:false,center:false,highlight:false,cropBoxMovable:true,cropBoxResizable:true,toggleDragModeOnDblclick:false});};}
@@ -515,7 +535,16 @@
         canvas.addEventListener('mousedown',startDraw);canvas.addEventListener('mouseup',stopDraw);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseout',stopDraw);
         canvas.addEventListener('touchstart',startDraw,{passive:false});canvas.addEventListener('touchend',stopDraw);canvas.addEventListener('touchmove',draw,{passive:false});
 
-        function resetEditorUI(){currentRawImage=null;document.getElementById('btn-markup').style.display='none';document.getElementById('markup-container').style.display='none';document.getElementById('snag-photo').value='';undoStack=[];if(cropper){cropper.destroy();cropper=null;}}
+        function resetEditorUI(){
+            currentRawImage=null;
+            document.getElementById('btn-markup').style.display='none';
+            document.getElementById('markup-container').style.display='none';
+            document.getElementById('snag-photo').value='';
+            document.getElementById('snag-photo-cam').value='';
+            document.getElementById('snag-photo-gal').value='';
+            undoStack=[];
+            if(cropper){cropper.destroy();cropper=null;}
+        }
 
         /* ── REPORT HEADER ── */
         function updateReportHeader(){
@@ -572,7 +601,7 @@
         function saveData(){const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};const a=document.createElement('a');a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d));a.download=(d.projName||'project')+'_snags.json';document.body.appendChild(a);a.click();a.remove();hasUnsavedChanges=false;localStorage.removeItem("snagProject");}
         function loadData(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});updateReportHeader();snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();hasUnsavedChanges=false;event.target.value='';}catch(err){alert("Error loading file.");}};r.readAsText(file);}
 
-        /* ── EXPORT PDF ── */
+        /* ── PDF EXPORT ── */
         function exportPDF(){
             const ti=document.getElementById('report-title');
             if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
