@@ -336,7 +336,7 @@
         .pdf-export-mode .snag-ref { color: #9a6800 !important; font-size: 13px !important; }
         .pdf-export-mode .snag-desc {
             color: #2a1f0e !important;
-            font-size: 15px !important; /* INCREASED FONT SIZE HERE */
+            font-size: 15px !important; 
             line-height: 1.55 !important;
             word-wrap: break-word !important;
             overflow-wrap: break-word !important;
@@ -374,7 +374,7 @@
         </div>
     </header>
 
-    <div class="main-layout">
+    <div class="main-layout" id="main-layout">
 
         <div class="panel no-print">
             <div class="panel-hdr">
@@ -398,7 +398,7 @@
         <div class="panel no-print">
             <div class="panel-hdr">
                 <div class="phdr-dot" style="background:var(--gold); box-shadow:0 0 7px rgba(154,104,0,0.4);"></div>
-                <span class="panel-ttl">Add / Edit Snag</span>
+                <span class="panel-ttl">Add / Edit Observation</span>
             </div>
             <div class="panel-body">
                 <div class="sec-lbl">Photo</div>
@@ -408,12 +408,12 @@
                     <span class="dz-text">Drag &amp; Drop Photo Here</span>
                     <span class="dz-sub" style="margin-bottom: 12px; display: block;">or choose an upload method</span>
                     
-                    <div style="display: flex; justify-content: center; gap: 10px; position: relative; z-index: 5;">
-                        <label class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85em; cursor: pointer; margin: 0;">
+                    <div style="display: flex; justify-content: center; gap: 12px; position: relative; z-index: 5; width: 100%;">
+                        <label class="btn btn-ghost" style="padding: 12px 20px; font-size: 1.05em; cursor: pointer; margin: 0; flex: 1; text-align: center; justify-content: center;">
                             📸 Camera
                             <input type="file" id="snag-photo-cam" accept="image/*" capture="environment" style="display:none;">
                         </label>
-                        <label class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85em; cursor: pointer; margin: 0;">
+                        <label class="btn btn-ghost" style="padding: 12px 20px; font-size: 1.05em; cursor: pointer; margin: 0; flex: 1; text-align: center; justify-content: center;">
                             🖼️ Gallery
                             <input type="file" id="snag-photo-gal" accept="image/*" style="display:none;">
                         </label>
@@ -438,11 +438,11 @@
                         <button class="btn btn-danger" style="margin-top:8px;" onclick="undoDrawing()">↩ Undo Last Stroke</button>
                     </div>
                 </div>
-                <div class="sec-lbl" style="margin-top:5px;">Description / Defect Details</div>
+                <div class="sec-lbl" style="margin-top:5px;">Description</div>
                 <div class="fg" style="margin-bottom:15px;">
                     <textarea id="snag-comment" placeholder="Describe the defect and required corrective action..."></textarea>
                 </div>
-                <button class="btn btn-gold btn-full" id="btn-add-snag" onclick="addSnag()">+ Add Snag</button>
+                <button class="btn btn-gold btn-full" id="btn-add-snag" onclick="addSnag()">+ Add Observation</button>
             </div>
         </div>
 
@@ -467,10 +467,10 @@
             <div class="dash-wrap" style="margin-bottom:16px;">
                 <div class="dash-card">
                     <span class="dash-val" id="dash-total">0</span>
-                    <span class="dash-lbl">Total Snags Logged</span>
+                    <span class="dash-lbl">Total Observations Logged</span>
                 </div>
             </div>
-            <div class="sec-lbl" style="margin-bottom:12px;">Snag Register</div>
+            <div class="sec-lbl" style="margin-bottom:12px;">Observation Register</div>
             <div id="snag-list"></div>
         </div>
 
@@ -516,7 +516,7 @@
                 URL.revokeObjectURL(url);
             };
             img.src=url;
-            e.target.value = ''; // Reset input to allow re-uploading same file
+            e.target.value = ''; 
         };
 
         document.getElementById('snag-photo').addEventListener('change', processPhoto);
@@ -550,7 +550,10 @@
         function updateReportHeader(){
             let rd=document.getElementById('proj-date').value,fd=rd;
             if(rd){const p=rd.split('-');if(p.length===3)fd=`${p[2]}/${p[1]}/${p[0]}`;}
-            document.querySelectorAll('.sync-rpt-title').forEach(el=>el.innerText=document.getElementById('report-title').value);
+            
+            const titleVal = document.getElementById('report-title').value || 'SNAG REPORT';
+            document.querySelectorAll('.sync-rpt-title').forEach(el=>el.innerText=titleVal);
+            
             document.querySelectorAll('.sync-proj-name').forEach(el=>el.innerText='Project: '+(document.getElementById('proj-name').value||'[Not Set]'));
             document.querySelectorAll('.sync-proj-mgr').forEach(el=>el.innerText='PM: '+(document.getElementById('proj-manager').value||'[Not Set]'));
             document.querySelectorAll('.sync-proj-date').forEach(el=>el.innerText='Date: '+(fd||'[Not Set]'));
@@ -565,7 +568,7 @@
             if(!ci.value.trim()&&!currentRawImage){alert("Add a description or photo.");return;}
             let img=null;
             if(currentRawImage){if(document.getElementById('markup-container').style.display==='block'){if(document.getElementById('drawing-stage').style.display==='block'){img=canvas.toDataURL('image/jpeg',0.85);}else{alert("Click 'Apply & Draw' first.");return;}}else{img=currentRawImage;}}
-            if(editingSnagId!==null){snagData[editingSnagId-1].image=img;snagData[editingSnagId-1].comment=ci.value;editingSnagId=null;document.getElementById('btn-add-snag').innerText='+ Add Snag';}
+            if(editingSnagId!==null){snagData[editingSnagId-1].image=img;snagData[editingSnagId-1].comment=ci.value;editingSnagId=null;document.getElementById('btn-add-snag').innerText='+ Add Observation';}
             else{snagData.push({id:snagCounter++,image:img,comment:ci.value});}
             ci.value='';resetEditorUI();hasUnsavedChanges=true;renderSnags();
         }
@@ -574,7 +577,7 @@
             const snag=snagData[id-1];document.getElementById('snag-comment').value=snag.comment||'';
             if(snag.image){currentRawImage=snag.image;document.getElementById('markup-container').style.display='block';document.getElementById('cropper-stage').style.display='block';document.getElementById('drawing-stage').style.display='none';document.getElementById('btn-markup').style.display='none';imageToEdit.src=currentRawImage;imageToEdit.onload=()=>{if(cropper)cropper.destroy();cropper=new Cropper(imageToEdit,{viewMode:1,dragMode:'move',autoCropArea:1,restore:false,guides:false,center:false,highlight:false,cropBoxMovable:true,cropBoxResizable:true,toggleDragModeOnDblclick:false});};}
             else{resetEditorUI();}
-            editingSnagId=id;document.getElementById('btn-add-snag').innerText='💾 Update Snag';
+            editingSnagId=id;document.getElementById('btn-add-snag').innerText='💾 Update Observation';
             const panels=document.querySelectorAll('.panel.no-print');if(panels[1])window.scrollTo({top:panels[1].offsetTop-75,behavior:'smooth'});
         }
 
@@ -593,7 +596,7 @@
                 const imgH=s.image?`<img src="${s.image}" alt="Snag Photo" class="snag-photo">`:`<div class="no-img">NO IMAGE</div>`;
                 html+=`<div class="snag-item"><div class="snag-photo-wrap">${imgH}</div><div class="snag-body"><div class="snag-top"><span class="snag-ref">${ref}</span></div><div class="snag-desc">${safe||'<em style="color:var(--text-muted)">No description provided.</em>'}</div><div class="snag-acts no-print"><button class="btn btn-edit" onclick="editSnag(${s.id})">✏️ Edit</button><button class="btn btn-danger" onclick="deleteSnag(${s.id})">🗑 Remove</button></div></div></div>`;
             });
-            lc.innerHTML=html||`<div style="text-align:center;padding:38px;color:var(--text-muted);font-family:var(--mono);font-size:0.82em;letter-spacing:1px;">NO SNAGS LOGGED YET</div>`;
+            lc.innerHTML=html||`<div style="text-align:center;padding:38px;color:var(--text-muted);font-family:var(--mono);font-size:0.82em;letter-spacing:1px;">NO OBSERVATIONS LOGGED YET</div>`;
             document.getElementById('dash-total').innerText=snagData.length;
         }
 
@@ -601,7 +604,7 @@
         function saveData(){const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};const a=document.createElement('a');a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d));a.download=(d.projName||'project')+'_snags.json';document.body.appendChild(a);a.click();a.remove();hasUnsavedChanges=false;localStorage.removeItem("snagProject");}
         function loadData(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});updateReportHeader();snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();hasUnsavedChanges=false;event.target.value='';}catch(err){alert("Error loading file.");}};r.readAsText(file);}
 
-        /* ── PDF EXPORT ── */
+        /* ── EXPORT PDF (RESTORED TO SAFE, ALIGNED BASELINE) ── */
         function exportPDF(){
             const ti=document.getElementById('report-title');
             if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
@@ -613,8 +616,8 @@
             container.classList.add('pdf-export-mode');
 
             const opt={
-                margin:[0.2, 0.5, 0.5, 0.5],
-                filename:(document.getElementById('proj-name').value||'Snag_Report')+'.pdf',
+                margin:[0.15, 0.4, 0.4, 0.4],
+                filename: ((document.getElementById('report-title').value || 'Report').replace(/[^a-z0-9]/gi, '_')) + '.pdf',
                 image:{type:'jpeg',quality:0.98},
                 html2canvas:{
                     scale:2,
@@ -625,19 +628,21 @@
                 jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
             };
 
+            const titleToPrint = document.getElementById('report-title').value || 'SNAG REPORT';
+
             html2pdf().set(opt).from(container).toPdf().get('pdf').then(function(pdf){
                 const n=pdf.internal.getNumberOfPages();
-                const title=ti.value, proj=document.getElementById('proj-name').value||'[Not Set]', pm=document.getElementById('proj-manager').value||'[Not Set]';
+                const proj=document.getElementById('proj-name').value||'[Not Set]', pm=document.getElementById('proj-manager').value||'[Not Set]';
                 const dateEl=document.querySelector('.sync-proj-date'), dt=dateEl?dateEl.innerText.replace('Date: ',''):'[Not Set]';
                 for(let i=1;i<=n;i++){
                     pdf.setPage(i);
                     if(i>1){
                         pdf.setFontSize(11);pdf.setTextColor(44,62,80);pdf.setFont('helvetica','bold');
-                        pdf.text(title.toUpperCase(),0.5,0.4);
+                        pdf.text(titleToPrint.toUpperCase(),0.4,0.4);
                         pdf.setFontSize(9);pdf.setFont('helvetica','normal');
-                        pdf.text(`Project: ${proj}   |   PM: ${pm}   |   Date: ${dt}`,0.5,0.55);
+                        pdf.text(`Project: ${proj}   |   PM: ${pm}   |   Date: ${dt}`,0.4,0.55);
                         pdf.setDrawColor(212,196,168);pdf.setLineWidth(0.01);
-                        pdf.line(0.5,0.65,pdf.internal.pageSize.getWidth()-0.5,0.65);
+                        pdf.line(0.4,0.65,pdf.internal.pageSize.getWidth()-0.4,0.65);
                     }
                     pdf.setFontSize(10);pdf.setTextColor(100);pdf.setFont('helvetica','normal');
                     pdf.text('Page '+i+' of '+n,pdf.internal.pageSize.getWidth()/2,pdf.internal.pageSize.getHeight()-0.2,{align:'center'});
@@ -651,11 +656,27 @@
         /* ── EXCEL ── */
         async function exportExcel(){
             const ti=document.getElementById('report-title');if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
-            const title=ti.value,projName=document.getElementById('proj-name').value||'N/A',projDate=document.getElementById('proj-date').value||'N/A',projManager=document.getElementById('proj-manager').value||'N/A',prefix=document.getElementById('report-prefix').value||'ADCOOP-SN';
-            const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Snag List');
-            ws.addRow([title.toUpperCase()]);ws.addRow(["Project:",projName,"Date:",projDate]);ws.addRow(["Manager:",projManager]);ws.addRow([]);ws.addRow(["Summary",`Total Snags: ${snagData.length}`]);ws.addRow([]);
-            const hr=ws.addRow(["Ref ID","Photo","Defect Description / Comments"]);hr.font={bold:true};ws.columns=[{width:15},{width:25},{width:70}];
-            const ft=document.getElementById('filter-text').value.toLowerCase();let row=8;
+            const title=ti.value || 'SNAG REPORT';
+            const projName=document.getElementById('proj-name').value||'N/A',rawDate=document.getElementById('proj-date').value,projManager=document.getElementById('proj-manager').value||'N/A',prefix=document.getElementById('report-prefix').value||'ADCOOP-SN';
+            
+            let projDate = 'N/A';
+            if (rawDate) {
+                const p = rawDate.split('-');
+                if (p.length === 3) projDate = `${p[2]}/${p[1]}/${p[0]}`;
+            }
+
+            const wb=new ExcelJS.Workbook();
+            const safeTabName = title.replace(/[\\\/*\?\[\]]/g, '').substring(0, 31) || 'Observations';
+            const ws=wb.addWorksheet(safeTabName);
+            ws.addRow([title.toUpperCase()]);
+            ws.addRow(["Project:",projName]);
+            ws.addRow(["Manager:",projManager]);
+            ws.addRow(["Date:",projDate]);
+            ws.addRow([]);
+            ws.addRow(["Summary",`Total Observations: ${snagData.length}`]);
+            ws.addRow([]);
+            const hr=ws.addRow(["Ref ID","Photo","Description"]);hr.font={bold:true};ws.columns=[{width:15},{width:25},{width:70}];
+            const ft=document.getElementById('filter-text').value.toLowerCase();let row=9;
             snagData.forEach(s=>{
                 if(ft&&!(s.comment||'').toLowerCase().includes(ft))return;
                 const ref=`${prefix}-${String(s.id).padStart(3,'0')}`;
@@ -664,7 +685,10 @@
                 row++;
             });
             const buf=await wb.xlsx.writeBuffer();
-            const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));a.download=(projName!=='N/A'?projName:'Project')+"_Snags.xlsx";document.body.appendChild(a);a.click();a.remove();
+            const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+            const safeFileName = title.replace(/[^a-z0-9]/gi, '_') || 'Project_Snags';
+            a.download= safeFileName + ".xlsx";
+            document.body.appendChild(a);a.click();a.remove();
         }
 
         /* ── AUTO-SAVE ── */
