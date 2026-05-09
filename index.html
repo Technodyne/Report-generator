@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
-    <title>Construction Snag Tracker</title>
+    <title>Report Generator</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -101,9 +101,8 @@
         }
         .header-brand { display:flex; align-items:center; gap:12px; }
         .header-icon { width:36px; height:36px; background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.22); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-        .header-title { font-family:var(--ui); font-size:1.2em; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fff; }
+        .header-title { font-family:var(--ui); font-size:1.2em; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fff; margin: 0; }
         .header-title span { color:#82c8f8; }
-        .header-sub { font-family:var(--mono); font-size:0.67em; color:rgba(255,255,255,0.4); letter-spacing:1px; }
         .header-right { display:flex; align-items:center; gap:9px; }
         .header-actions { display:flex; gap:6px; align-items:center; }
 
@@ -234,7 +233,7 @@
             max-width: 760px !important;
             min-width: 760px !important;
             margin: 0 auto !important;
-            padding: 0 10px 10px 10px !important; 
+            padding: 0 10px 10px 10px !important;
             background-color: #fff !important;
             color: #222 !important;
             box-sizing: border-box !important;
@@ -246,7 +245,7 @@
             border-radius: 4px !important;
             box-shadow: none !important;
             padding: 16px !important;
-            margin-top: 0 !important; 
+            margin-top: 0 !important;
             margin-bottom: 16px !important;
             width: 100% !important;
             box-sizing: border-box !important;
@@ -354,8 +353,7 @@
         <div class="header-brand">
             <div class="header-icon">📋</div>
             <div>
-                <div class="header-title">Snag <span>Tracker</span></div>
-                <div class="header-sub">CONSTRUCTION DEFECT LOG</div>
+                <div class="header-title">REPORT <span>GENERATOR</span></div>
             </div>
         </div>
         <div class="header-right">
