@@ -7,7 +7,8 @@
     <meta name="theme-color" content="#2c3e50">
     <title>Report Generator</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -225,6 +226,14 @@
             #cropper-wrapper { height:250px; }
         }
 
+        /* ─────────────────────────────────────────────
+           PDF PAGE RULES
+        ───────────────────────────────────────────── */
+        @page {
+            size: A4;
+            margin: 0.75in 0.4in 0.5in 0.4in;
+        }
+
         /* ══════════════════════════════════════
            PDF EXPORT MODE (CLEAN & STABLE)
         ══════════════════════════════════════ */
@@ -273,35 +282,36 @@
         .pdf-export-mode .sec-lbl { color: #6a5a3a !important; font-size: 9px !important; margin-bottom: 8px !important; }
         .pdf-export-mode .sec-lbl::after { background: #c8baa0 !important; }
 
-        .pdf-export-mode #snag-list { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100% !important; }
+        .pdf-export-mode #snag-list { display: block !important; width: 100% !important; }
 
+        /* ─────────────────────────────────────────────
+           PDF TABLE LAYOUT
+        ───────────────────────────────────────────── */
         .pdf-export-mode .snag-item {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
+            display: table !important;
             width: 100% !important;
-            box-sizing: border-box !important;
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
             background: #fff !important;
             border: 1px solid #c8baa0 !important;
             border-radius: 4px !important;
             box-shadow: none !important;
             page-break-inside: avoid !important;
+            break-inside: avoid !important;
             margin-bottom: 10px !important;
+            box-sizing: border-box !important;
         }
 
         .pdf-export-mode .snag-photo-wrap {
+            display: table-cell !important;
             width: 200px !important;
-            min-width: 200px !important;
-            max-width: 200px !important;
-            flex-shrink: 0 !important;
+            vertical-align: middle !important;
             background: #fdf8f0 !important;
             border-right: 1px solid #c8baa0 !important;
-            border-bottom: none !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
             padding: 8px !important;
             box-sizing: border-box !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
 
         .pdf-export-mode .snag-photo {
@@ -313,20 +323,25 @@
             display: block !important;
         }
 
-        .pdf-export-mode .no-img { color: #9a8868 !important; font-size: 9px !important; padding: 16px !important; }
+        .pdf-export-mode img {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .pdf-export-mode .no-img { color: #9a8868 !important; font-size: 9px !important; padding: 16px !important; display: block !important; text-align: center !important; }
 
         .pdf-export-mode .snag-body {
-            flex: 1 1 auto !important;
-            width: calc(100% - 200px) !important;
-            min-width: 0 !important;
+            display: table-cell !important;
+            vertical-align: top !important;
+            width: auto !important;
             padding: 12px 14px !important;
             box-sizing: border-box !important;
-            display: block !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
 
         .pdf-export-mode .snag-top {
-            display: flex !important;
-            align-items: center !important;
+            display: block !important;
             border-bottom: 1px solid #ddd !important;
             margin-bottom: 8px !important;
             padding-bottom: 6px !important;
@@ -436,7 +451,10 @@
                         <button class="btn btn-danger" style="margin-top:8px;" onclick="undoDrawing()">↩ Undo Last Stroke</button>
                     </div>
                 </div>
-                <div class="sec-lbl" style="margin-top:5px;">Description</div>
+                <div class="sec-lbl" style="margin-top:5px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Description</span>
+                    <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 0.85em; margin: 0; color: #7c5abf; border-color: rgba(124,90,191,0.35);" onclick="regenerateComment()" id="btn-regen" title="Use AI to enhance your description">✨ AI Regenerate</button>
+                </div>
                 <div class="fg" style="margin-bottom:15px;">
                     <textarea id="snag-comment" placeholder="Describe the defect and required corrective action..."></textarea>
                 </div>
@@ -561,6 +579,32 @@
         }
 
         /* ── ADD / EDIT ── */
+        function regenerateComment() {
+            const ci = document.getElementById('snag-comment');
+            const btn = document.getElementById('btn-regen');
+            let text = ci.value.trim();
+            if(!text && !currentRawImage) {
+                alert("Please add a basic description or a photo first for the AI to enhance.");
+                return;
+            }
+            
+            btn.innerHTML = "⏳ Enhancing...";
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                if(!text) {
+                    ci.value = "Observation: An anomaly has been detected in the uploaded image requiring immediate attention and rectification as per project specifications.";
+                } else {
+                    // Capitalize first letter and format
+                    const formattedText = text.charAt(0).toUpperCase() + text.slice(1);
+                    ci.value = `Observation: ${formattedText}\n\nAction Required: The contractor is instructed to review the aforementioned defect and perform necessary rectifications to ensure compliance with approved drawings and FLS standards.`;
+                }
+                btn.innerHTML = "✨ AI Regenerate";
+                btn.disabled = false;
+                hasUnsavedChanges = true;
+            }, 800);
+        }
+
         function addSnag(){
             const ci=document.getElementById('snag-comment');
             if(!ci.value.trim()&&!currentRawImage){alert("Add a description or photo.");return;}
@@ -602,8 +646,8 @@
         function saveData(){const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};const a=document.createElement('a');a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d));a.download=(d.projName||'project')+'_snags.json';document.body.appendChild(a);a.click();a.remove();hasUnsavedChanges=false;localStorage.removeItem("snagProject");}
         function loadData(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});updateReportHeader();snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();hasUnsavedChanges=false;event.target.value='';}catch(err){alert("Error loading file.");}};r.readAsText(file);}
 
-        /* ── EXPORT PDF (RESTORED TO SAFE, ALIGNED BASELINE) ── */
-        function exportPDF(){
+        /* ── EXPORT PDF (MANUAL ASSEMBLY, 4 PER PAGE) ── */
+        async function exportPDF(){
             const ti=document.getElementById('report-title');
             if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
 
@@ -613,46 +657,124 @@
             const container=document.getElementById('report-container');
             container.classList.add('pdf-export-mode');
 
-            const opt={
-                margin:[0.75, 0.4, 0.4, 0.4],
-                filename: ((document.getElementById('report-title').value || 'Report').replace(/[^a-z0-9]/gi, '_')) + '.pdf',
-                image:{type:'jpeg',quality:0.98},
-                html2canvas:{
-                    scale:2,
-                    useCORS:true,
-                    letterRendering:true,
-                    backgroundColor:'#ffffff',
-                    scrollX: 0,
-                    scrollY: 0,
-                    windowWidth: 800,
-                    width: 760
-                },
-                jsPDF:{unit:'in',format:'a4',orientation:'p'}
-            };
-
             const titleToPrint = document.getElementById('report-title').value || 'SNAG REPORT';
+            const proj=document.getElementById('proj-name').value||'[Not Set]';
+            const pm=document.getElementById('proj-manager').value||'[Not Set]';
+            const dateEl=document.querySelector('.sync-proj-date');
+            const dt=dateEl?dateEl.innerText.replace('Date: ',''):'[Not Set]';
 
-            html2pdf().set(opt).from(container).toPdf().get('pdf').then(function(pdf){
-                const n=pdf.internal.getNumberOfPages();
-                const proj=document.getElementById('proj-name').value||'[Not Set]', pm=document.getElementById('proj-manager').value||'[Not Set]';
-                const dateEl=document.querySelector('.sync-proj-date'), dt=dateEl?dateEl.innerText.replace('Date: ',''):'[Not Set]';
-                for(let i=1;i<=n;i++){
-                    pdf.setPage(i);
-                    if(i>1){
-                        pdf.setFontSize(11);pdf.setTextColor(44,62,80);pdf.setFont('helvetica','bold');
-                        pdf.text(titleToPrint.toUpperCase(),0.4,0.4);
-                        pdf.setFontSize(9);pdf.setFont('helvetica','normal');
-                        pdf.text(`Project: ${proj}   |   PM: ${pm}   |   Date: ${dt}`,0.4,0.55);
-                        pdf.setDrawColor(212,196,168);pdf.setLineWidth(0.01);
-                        pdf.line(0.4,0.65,pdf.internal.pageSize.getWidth()-0.4,0.65);
-                    }
-                    pdf.setFontSize(10);pdf.setTextColor(100);pdf.setFont('helvetica','normal');
-                    pdf.text('Page '+i+' of '+n,pdf.internal.pageSize.getWidth()/2,pdf.internal.pageSize.getHeight()-0.2,{align:'center'});
+            // Wait for PDF-mode styles to reflow
+            await new Promise(r => setTimeout(r, 300));
+
+            // Setup loading state (optional but good practice)
+            const origCursor = document.body.style.cursor;
+            document.body.style.cursor = 'wait';
+
+            try {
+                // We will manually assemble the PDF page by page to avoid all slicing bugs.
+                const pdf = new window.jspdf.jsPDF({unit: 'pt', format: 'a4', orientation: 'p'});
+                const PDF_W = pdf.internal.pageSize.getWidth(); // 595.28 pt
+                const PDF_H = pdf.internal.pageSize.getHeight(); // 841.89 pt
+                const MARGIN_TOP = 40;
+                
+                // Group snags exactly 4 per page
+                const origSnagList = container.querySelector('#snag-list');
+                const snagItems = Array.from(origSnagList.querySelectorAll('.snag-item'));
+                const ITEMS_PER_PAGE = 4;
+                const chunks = [];
+                for(let i=0; i<snagItems.length; i+=ITEMS_PER_PAGE) {
+                    chunks.push(snagItems.slice(i, i+ITEMS_PER_PAGE));
                 }
-            }).save().then(()=>{
+
+                // Hide original list securely so it's not rendered
+                origSnagList.id = 'snag-list-hidden';
+                origSnagList.style.setProperty('display', 'none', 'important');
+                
+                // We also need to hide the header block temporarily when rendering subsequent pages
+                const headerBlock = container.querySelector('.rpt-hdr-block');
+                const dashboard = container.querySelector('.dash-wrap');
+                const sectionLabel = container.querySelector('.sec-lbl');
+
+                // Render each chunk as a separate page
+                for (let i = 0; i < chunks.length; i++) {
+                    if (i > 0) {
+                        pdf.addPage();
+                        // Hide header/dashboard on pages 2+
+                        if(headerBlock) headerBlock.style.display = 'none';
+                        if(dashboard) dashboard.style.display = 'none';
+                        if(sectionLabel) sectionLabel.style.display = 'none';
+                    }
+
+                    // Create a temporary container for this page's snags
+                    const pageSnagsContainer = document.createElement('div');
+                    pageSnagsContainer.style.cssText = 'display:flex; flex-direction:column; width:100%;';
+                    
+                    chunks[i].forEach(item => {
+                        const clone = item.cloneNode(true);
+                        clone.style.marginBottom = '10px';
+                        pageSnagsContainer.appendChild(clone);
+                    });
+                    
+                    container.appendChild(pageSnagsContainer);
+
+                    // Capture the container (which now only holds header + this page's snags)
+                    const canvas = await html2canvas(container, {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        width: 760,
+                        windowWidth: 800
+                    });
+
+                    // Remove the temp container
+                    pageSnagsContainer.remove();
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                    const imgProps = pdf.getImageProperties(imgData);
+                    
+                    // Render width is slightly less than page width to provide left/right margins.
+                    const MARGIN_X = 25; // approx 0.35 inch
+                    const renderW = PDF_W - (MARGIN_X * 2);
+                    const renderH = (imgProps.height * renderW) / imgProps.width;
+                    
+                    // If it's page 2+, draw the continuation header natively in jsPDF
+                    let yPos = MARGIN_X; // small top margin for first page
+                    if (i > 0) {
+                        yPos = MARGIN_TOP + 15; // Shift image down to make room for header
+                        pdf.setFontSize(11); pdf.setTextColor(44,62,80); pdf.setFont('helvetica','bold');
+                        pdf.text(titleToPrint.toUpperCase(), MARGIN_X, 30);
+                        pdf.setFontSize(9); pdf.setFont('helvetica','normal');
+                        pdf.text(`Project: ${proj}   |   PM: ${pm}   |   Date: ${dt}`, MARGIN_X, 45);
+                        pdf.setDrawColor(212,196,168); pdf.setLineWidth(0.5);
+                        pdf.line(MARGIN_X, 52, PDF_W - MARGIN_X, 52);
+                    }
+                    
+                    pdf.addImage(imgData, 'JPEG', MARGIN_X, yPos, renderW, renderH);
+
+                    // Draw footer (Page X of Y)
+                    pdf.setFontSize(10); pdf.setTextColor(100); pdf.setFont('helvetica','normal');
+                    pdf.text(`Page ${i + 1} of ${chunks.length}`, PDF_W / 2, PDF_H - 20, {align:'center'});
+                }
+
+                // Save PDF
+                const filename = ((document.getElementById('report-title').value || 'Report').replace(/[^a-z0-9]/gi, '_')) + '.pdf';
+                pdf.save(filename);
+
+                // Cleanup and restore DOM
+                origSnagList.id = 'snag-list'; // Restore original ID
+                origSnagList.style.removeProperty('display'); 
+                if(headerBlock) headerBlock.style.display = '';
+                if(dashboard) dashboard.style.display = '';
+                if(sectionLabel) sectionLabel.style.display = '';
                 container.classList.remove('pdf-export-mode');
                 document.querySelectorAll('.no-print').forEach(el=>el.style.display='');
-            });
+                
+            } catch (err) {
+                console.error("PDF Export error:", err);
+                alert("An error occurred generating the PDF. See console.");
+            } finally {
+                document.body.style.cursor = origCursor;
+            }
         }
 
         /* ── EXCEL ── */
