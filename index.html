@@ -6,7 +6,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <title>Report Generator</title>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -15,136 +15,264 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ══════════════════════════════════════
-           LIGHT / BEIGE THEME  (default)
-        ══════════════════════════════════════ */
         :root,
         [data-theme="light"] {
-            --bg-page:       #f0e8d8;
-            --bg-panel:      #fdf8f0;
-            --bg-card:       #f7f1e6;
-            --bg-input:      #fdf8f0;
-            --border:        #d4c4a8;
-            --border-hi:     #b8a488;
-            --accent:        #1864c4;
-            --accent-glow:   rgba(24,100,196,0.15);
-            --gold:          #9a6800;
-            --text-pri:      #2a1f0e;
-            --text-sec:      #5a4a30;
-            --text-muted:    #9a8868;
-            --success:       #0a7a58;
-            --danger:        #c02236;
-            --warning:       #a85800;
-            --grid-ln:       rgba(154,104,0,0.06);
-            --shadow:        0 2px 10px rgba(0,0,0,0.08);
-            --hdr-bg:        linear-gradient(135deg,#15387a 0%,#1a4c96 100%);
-            --panel-hdr-bg:  linear-gradient(90deg,#ede3d0,transparent);
-            --drop-bg:       #f7f1e4;
-            --snag-img-bg:   #ede3d0;
-            --mono:          'Share Tech Mono', monospace;
-            --ui:            'Rajdhani', sans-serif;
+            --bg-page:#f0e8d8;
+            --bg-panel:#fdf8f0;
+            --bg-card:#f7f1e6;
+            --bg-input:#fdf8f0;
+            --border:#d4c4a8;
+            --border-hi:#b8a488;
+            --accent:#1864c4;
+            --accent-glow:rgba(24,100,196,0.15);
+            --gold:#9a6800;
+            --text-pri:#2a1f0e;
+            --text-sec:#5a4a30;
+            --text-muted:#9a8868;
+            --success:#0a7a58;
+            --danger:#c02236;
+            --warning:#a85800;
+            --grid-ln:rgba(154,104,0,0.06);
+            --shadow:0 2px 10px rgba(0,0,0,0.08);
+            --hdr-bg:linear-gradient(135deg,#15387a 0%,#1a4c96 100%);
+            --panel-hdr-bg:linear-gradient(90deg,#ede3d0,transparent);
+            --drop-bg:#f7f1e4;
+            --snag-img-bg:#ede3d0;
+            --mono:'Share Tech Mono', monospace;
+            --ui:'Rajdhani', sans-serif;
         }
 
-        /* ══════════════════════════════════════
-           DARK THEME
-        ══════════════════════════════════════ */
         [data-theme="dark"] {
-            --bg-page:       #060e1f;
-            --bg-panel:      #0d1b2e;
-            --bg-card:       #111f35;
-            --bg-input:      #0a1628;
-            --border:        #1e3a5f;
-            --border-hi:     #2a5080;
-            --accent:        #2196f3;
-            --accent-glow:   rgba(33,150,243,0.28);
-            --gold:          #f0c040;
-            --text-pri:      #d0e4f7;
-            --text-sec:      #7a9ec0;
-            --text-muted:    #3d6080;
-            --success:       #00c896;
-            --danger:        #f04060;
-            --warning:       #f0a020;
-            --grid-ln:       rgba(33,150,243,0.05);
-            --shadow:        0 4px 20px rgba(0,0,0,0.4);
-            --hdr-bg:        linear-gradient(135deg,#0a1628 0%,#0d1f3a 100%);
-            --panel-hdr-bg:  linear-gradient(90deg,#111f35,transparent);
-            --drop-bg:       #0a1628;
-            --snag-img-bg:   #080f1a;
+            --bg-page:#060e1f;
+            --bg-panel:#0d1b2e;
+            --bg-card:#111f35;
+            --bg-input:#0a1628;
+            --border:#1e3a5f;
+            --border-hi:#2a5080;
+            --accent:#2196f3;
+            --accent-glow:rgba(33,150,243,0.28);
+            --gold:#f0c040;
+            --text-pri:#d0e4f7;
+            --text-sec:#7a9ec0;
+            --text-muted:#3d6080;
+            --success:#00c896;
+            --danger:#f04060;
+            --warning:#f0a020;
+            --grid-ln:rgba(33,150,243,0.05);
+            --shadow:0 4px 20px rgba(0,0,0,0.4);
+            --hdr-bg:linear-gradient(135deg,#0a1628 0%,#0d1f3a 100%);
+            --panel-hdr-bg:linear-gradient(90deg,#111f35,transparent);
+            --drop-bg:#0a1628;
+            --snag-img-bg:#080f1a;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
+        * { box-sizing:border-box; margin:0; padding:0; }
         body {
-            font-family: var(--ui);
-            background: var(--bg-page);
-            color: var(--text-pri);
-            min-height: 100vh;
+            font-family:var(--ui);
+            background:var(--bg-page);
+            color:var(--text-pri);
+            min-height:100vh;
             background-image:
                 linear-gradient(var(--grid-ln) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-ln) 1px, transparent 1px);
-            background-size: 40px 40px;
-            transition: background-color 0.3s, color 0.3s;
+            background-size:40px 40px;
+            transition:background-color .3s,color .3s;
         }
 
-        /* ── HEADER ── */
         .app-header {
-            background: var(--hdr-bg);
-            padding: 0 24px;
-            display: flex; align-items: center; justify-content: space-between;
-            height: 62px;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 3px 18px rgba(0,0,0,0.28);
+            background:var(--hdr-bg);
+            padding:0 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            height:62px;
+            position:sticky;
+            top:0;
+            z-index:100;
+            box-shadow:0 3px 18px rgba(0,0,0,0.28);
         }
         .app-header::after {
-            content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
-            background: linear-gradient(90deg,transparent,var(--accent),#f0c040,var(--accent),transparent);
+            content:'';
+            position:absolute;
+            bottom:0;
+            left:0;
+            right:0;
+            height:2px;
+            background:linear-gradient(90deg,transparent,var(--accent),#f0c040,var(--accent),transparent);
             opacity:.85;
         }
         .header-brand { display:flex; align-items:center; gap:12px; }
-        .header-icon { width:36px; height:36px; background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.22); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-        .header-title { font-family:var(--ui); font-size:1.2em; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fff; margin: 0; }
+        .header-icon {
+            width:36px;
+            height:36px;
+            background:rgba(255,255,255,0.13);
+            border:1px solid rgba(255,255,255,0.22);
+            border-radius:7px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:18px;
+        }
+        .header-title {
+            font-size:1.2em;
+            font-weight:700;
+            letter-spacing:2px;
+            text-transform:uppercase;
+            color:#fff;
+        }
         .header-title span { color:#82c8f8; }
-        .header-right { display:flex; align-items:center; gap:9px; }
-        .header-actions { display:flex; gap:6px; align-items:center; }
+        .header-right, .header-actions { display:flex; align-items:center; gap:9px; }
+        .header-actions { gap:6px; }
 
-        /* ── THEME PILL ── */
-        .theme-pill { display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:22px; padding:5px 11px 5px 7px; cursor:pointer; transition:background .2s; user-select:none; }
+        .theme-pill {
+            display:flex;
+            align-items:center;
+            gap:7px;
+            background:rgba(255,255,255,0.1);
+            border:1px solid rgba(255,255,255,0.18);
+            border-radius:22px;
+            padding:5px 11px 5px 7px;
+            cursor:pointer;
+            transition:background .2s;
+            user-select:none;
+        }
         .theme-pill:hover { background:rgba(255,255,255,0.2); }
-        .tp-track { width:34px; height:18px; background:rgba(255,255,255,0.2); border-radius:9px; position:relative; transition:background .3s; flex-shrink:0; }
+        .tp-track {
+            width:34px;
+            height:18px;
+            background:rgba(255,255,255,0.2);
+            border-radius:9px;
+            position:relative;
+            transition:background .3s;
+            flex-shrink:0;
+        }
         [data-theme="dark"] .tp-track { background:#2196f3; }
-        .tp-thumb { width:14px; height:14px; background:#fff; border-radius:50%; position:absolute; top:2px; left:2px; transition:transform .3s cubic-bezier(.34,1.56,.64,1); box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+        .tp-thumb {
+            width:14px;
+            height:14px;
+            background:#fff;
+            border-radius:50%;
+            position:absolute;
+            top:2px;
+            left:2px;
+            transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+            box-shadow:0 1px 4px rgba(0,0,0,0.3);
+        }
         [data-theme="dark"] .tp-thumb { transform:translateX(16px); }
-        .tp-icon { font-size:0.95em; line-height:1; }
-        .tp-label { font-family:var(--mono); font-size:0.68em; color:rgba(255,255,255,0.75); letter-spacing:1px; text-transform:uppercase; white-space:nowrap; }
+        .tp-icon { font-size:.95em; line-height:1; }
+        .tp-label {
+            font-family:var(--mono);
+            font-size:.68em;
+            color:rgba(255,255,255,0.75);
+            letter-spacing:1px;
+            text-transform:uppercase;
+            white-space:nowrap;
+        }
 
-        /* ── HEADER BTNS ── */
-        .btn-hdr { font-family:var(--ui); font-weight:600; font-size:0.82em; letter-spacing:.7px; text-transform:uppercase; padding:7px 13px; border-radius:5px; cursor:pointer; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); display:inline-flex; align-items:center; gap:5px; white-space:nowrap; transition:all .2s; }
+        .btn-hdr {
+            font-family:var(--ui);
+            font-weight:600;
+            font-size:.82em;
+            letter-spacing:.7px;
+            text-transform:uppercase;
+            padding:7px 13px;
+            border-radius:5px;
+            cursor:pointer;
+            background:rgba(255,255,255,0.1);
+            color:#fff;
+            border:1px solid rgba(255,255,255,0.2);
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            white-space:nowrap;
+            transition:all .2s;
+        }
         .btn-hdr:hover { background:rgba(255,255,255,0.22); border-color:rgba(255,255,255,0.35); }
 
-        /* ── LAYOUT ── */
-        .main-layout { max-width:1100px; margin:0 auto; padding:22px 18px; display:flex; flex-direction:column; gap:16px; }
-
-        /* ── PANELS ── */
-        .panel { background:var(--bg-panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); transition:background .3s, border-color .3s; }
-        .panel-hdr { background:var(--panel-hdr-bg); border-bottom:1px solid var(--border); padding:10px 18px; display:flex; align-items:center; gap:9px; }
-        .phdr-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent-glow); flex-shrink:0; }
-        .panel-ttl { font-family:var(--mono); font-size:0.76em; letter-spacing:2px; text-transform:uppercase; color:var(--accent); }
+        .main-layout {
+            max-width:1100px;
+            margin:0 auto;
+            padding:22px 18px;
+            display:flex;
+            flex-direction:column;
+            gap:16px;
+        }
+        .panel {
+            background:var(--bg-panel);
+            border:1px solid var(--border);
+            border-radius:8px;
+            overflow:hidden;
+            box-shadow:var(--shadow);
+            transition:background .3s,border-color .3s;
+        }
+        .panel-hdr {
+            background:var(--panel-hdr-bg);
+            border-bottom:1px solid var(--border);
+            padding:10px 18px;
+            display:flex;
+            align-items:center;
+            gap:9px;
+        }
+        .phdr-dot {
+            width:7px;
+            height:7px;
+            border-radius:50%;
+            background:var(--accent);
+            box-shadow:0 0 6px var(--accent-glow);
+            flex-shrink:0;
+        }
+        .panel-ttl {
+            font-family:var(--mono);
+            font-size:.76em;
+            letter-spacing:2px;
+            text-transform:uppercase;
+            color:var(--accent);
+        }
         .panel-body { padding:18px; }
 
-        /* ── GRIDS ── */
         .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:13px; }
         .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
-
-        /* ── FORMS ── */
         .fg { display:flex; flex-direction:column; gap:5px; }
-        label { font-family:var(--mono); font-size:0.69em; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-sec); }
-        input[type="text"], input[type="date"], select, textarea { background:var(--bg-input); border:1px solid var(--border); border-radius:5px; color:var(--text-pri); font-family:var(--ui); font-size:0.94em; font-weight:500; padding:9px 12px; width:100%; outline:none; transition:border-color .2s, box-shadow .2s, background .3s; -webkit-appearance:none; }
+        label {
+            font-family:var(--mono);
+            font-size:.69em;
+            letter-spacing:1.5px;
+            text-transform:uppercase;
+            color:var(--text-sec);
+        }
+        input[type="text"], input[type="date"], select, textarea {
+            background:var(--bg-input);
+            border:1px solid var(--border);
+            border-radius:5px;
+            color:var(--text-pri);
+            font-family:var(--ui);
+            font-size:.94em;
+            font-weight:500;
+            padding:9px 12px;
+            width:100%;
+            outline:none;
+            transition:border-color .2s,box-shadow .2s,background .3s;
+            -webkit-appearance:none;
+        }
         input:focus, select:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
-        select option { background:var(--bg-panel); color:var(--text-pri); }
         textarea { resize:vertical; min-height:88px; line-height:1.55; }
 
-        /* ── BUTTONS ── */
-        .btn { font-family:var(--ui); font-weight:700; font-size:0.86em; letter-spacing:.7px; text-transform:uppercase; padding:9px 15px; border:none; border-radius:5px; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+        .btn {
+            font-family:var(--ui);
+            font-weight:700;
+            font-size:.86em;
+            letter-spacing:.7px;
+            text-transform:uppercase;
+            padding:9px 15px;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+            transition:all .2s;
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            white-space:nowrap;
+        }
         .btn-gold { background:var(--gold); color:#fff; }
         .btn-gold:hover { filter:brightness(1.1); }
         .btn-ghost { background:transparent; color:var(--text-sec); border:1px solid var(--border); }
@@ -158,220 +286,289 @@
         .btn-markup { background:transparent; color:#7c5abf; border:1px solid rgba(124,90,191,0.35); }
         [data-theme="dark"] .btn-markup { color:#a78bfa; border-color:rgba(167,139,250,0.3); }
         .btn-markup:hover { background:rgba(124,90,191,0.08); }
-        .btn-full { width:100%; justify-content:center; padding:12px; font-size:0.94em; }
+        .btn-full { width:100%; justify-content:center; padding:12px; font-size:.94em; }
 
-        /* ── DASHBOARD ── */
         .dash-wrap { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        .dash-card { background:var(--bg-card); border:1px solid var(--border); border-radius:6px; padding:13px 16px; text-align:center; transition:background .3s, border-color .3s; }
-        .dash-val { font-family:var(--mono); font-size:1.9em; font-weight:700; display:block; line-height:1; margin-bottom:4px; color:var(--accent); }
-        .dash-lbl { font-family:var(--mono); font-size:0.66em; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); }
+        .dash-card {
+            background:var(--bg-card);
+            border:1px solid var(--border);
+            border-radius:6px;
+            padding:13px 16px;
+            text-align:center;
+            transition:background .3s,border-color .3s;
+        }
+        .dash-val {
+            font-family:var(--mono);
+            font-size:1.9em;
+            font-weight:700;
+            display:block;
+            line-height:1;
+            margin-bottom:4px;
+            color:var(--accent);
+        }
+        .dash-lbl {
+            font-family:var(--mono);
+            font-size:.66em;
+            letter-spacing:1.5px;
+            text-transform:uppercase;
+            color:var(--text-muted);
+        }
 
-        /* ── FILTER BAR ── */
-        .filter-bar { display:flex; gap:10px; align-items:center; padding:12px 16px; background:var(--bg-panel); border-radius:8px; border:1px solid var(--border); box-shadow:var(--shadow); transition:background .3s; }
-        .filter-bar label { color:var(--text-muted); font-size:0.72em; white-space:nowrap; }
+        .filter-bar {
+            display:flex;
+            gap:10px;
+            align-items:center;
+            padding:12px 16px;
+            background:var(--bg-panel);
+            border-radius:8px;
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            transition:background .3s;
+        }
+        .filter-bar label { color:var(--text-muted); font-size:.72em; white-space:nowrap; }
         .filter-bar input { background:var(--bg-input); flex:1; }
 
-        /* ── DROP ZONE ── */
-        .drop-zone { border:2px dashed var(--border); border-radius:6px; padding:22px; text-align:center; background:var(--drop-bg); transition:all .25s; margin-bottom:13px; display:block; }
+        .drop-zone {
+            border:2px dashed var(--border);
+            border-radius:6px;
+            padding:22px;
+            text-align:center;
+            background:var(--drop-bg);
+            transition:all .25s;
+            margin-bottom:13px;
+            display:block;
+        }
         .drop-zone.drag-over { border-color:var(--accent); background:var(--accent-glow); }
         .dz-icon { font-size:1.7em; display:block; margin-bottom:7px; }
-        .dz-text { font-size:0.87em; color:var(--text-sec); display:block; }
-        .dz-sub  { font-size:0.74em; color:var(--text-muted); display:block; margin-top:3px; }
+        .dz-text { font-size:.87em; color:var(--text-sec); display:block; }
+        .dz-sub { font-size:.74em; color:var(--text-muted); display:block; margin-top:3px; }
+        .upload-methods { display:flex; justify-content:center; gap:12px; position:relative; z-index:5; width:100%; }
+        .upload-methods label { padding:12px 20px; font-size:1.05em; cursor:pointer; margin:0; flex:1; text-align:center; justify-content:center; }
 
-        /* ── MARKUP EDITOR ── */
         #markup-container { display:none; margin-bottom:13px; }
         #cropper-wrapper { height:350px; background:#111; margin-bottom:9px; border-radius:5px; overflow:hidden; }
-        #markup-canvas { border:1px solid var(--border-hi); border-radius:4px; max-width:100%; touch-action:none; cursor:crosshair; background:#eee; display:block; }
+        #image-to-edit { max-width:100%; display:block; }
+        #markup-canvas {
+            border:1px solid var(--border-hi);
+            border-radius:4px;
+            max-width:100%;
+            touch-action:none;
+            cursor:crosshair;
+            background:#eee;
+            display:block;
+        }
         .edit-tb { display:flex; gap:7px; margin-bottom:9px; flex-wrap:wrap; }
         .edit-tb .btn { flex:1; }
 
-        /* ── SNAG ITEMS ── */
         #snag-list { display:flex; flex-direction:column; gap:12px; }
-        .snag-item { display:flex; background:var(--bg-card); border:1px solid var(--border); border-radius:7px; overflow:hidden; transition:border-color .2s, background .3s; page-break-inside:avoid !important; box-shadow:var(--shadow); }
+        .snag-item {
+            display:flex;
+            background:var(--bg-card);
+            border:1px solid var(--border);
+            border-radius:7px;
+            overflow:hidden;
+            transition:border-color .2s,background .3s;
+            page-break-inside:avoid !important;
+            box-shadow:var(--shadow);
+        }
         .snag-item:hover { border-color:var(--border-hi); }
-        .snag-photo-wrap { width:168px; min-width:168px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--border); background:var(--snag-img-bg); flex-shrink:0; }
+        .snag-photo-wrap {
+            width:168px;
+            min-width:168px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-right:1px solid var(--border);
+            background:var(--snag-img-bg);
+            flex-shrink:0;
+        }
         .snag-photo { max-width:100%; max-height:175px; object-fit:contain; display:block; }
-        .no-img { color:var(--text-muted); font-family:var(--mono); font-size:0.71em; letter-spacing:1px; text-align:center; padding:20px; }
+        .no-img {
+            color:var(--text-muted);
+            font-family:var(--mono);
+            font-size:.71em;
+            letter-spacing:1px;
+            text-align:center;
+            padding:20px;
+        }
         .snag-body { padding:13px 17px; flex-grow:1; display:flex; flex-direction:column; min-width:0; }
-        .snag-top { display:flex; align-items:center; gap:10px; margin-bottom:9px; padding-bottom:9px; border-bottom:1px solid var(--border); }
+        .snag-top {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin-bottom:9px;
+            padding-bottom:9px;
+            border-bottom:1px solid var(--border);
+        }
         .snag-ref { font-family:var(--mono); font-size:1em; color:var(--gold); font-weight:700; letter-spacing:1px; }
-        .snag-desc { font-size:0.94em; color:var(--text-pri); line-height:1.6; flex-grow:1; word-wrap:break-word; overflow-wrap:break-word; }
+        .snag-desc {
+            font-size:.94em;
+            color:var(--text-pri);
+            line-height:1.6;
+            flex-grow:1;
+            word-wrap:break-word;
+            overflow-wrap:break-word;
+        }
         .snag-acts { margin-top:11px; display:flex; justify-content:flex-end; gap:7px; }
 
-        /* ── REPORT HEADER BLOCK ── */
-        .rpt-hdr-block { background:var(--bg-panel); border:1px solid var(--border); border-radius:8px; padding:17px 19px; margin-bottom:16px; box-shadow:var(--shadow); transition:background .3s; }
-        .rpt-title { font-family:var(--ui); font-size:1.2em; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--text-pri); text-align:center; margin-bottom:13px; }
-        .rpt-meta-row { display:flex; justify-content:space-between; align-items:center; }
-        .rpt-meta-text { font-size:0.88em; color:var(--text-sec); line-height:1.8; }
+        .rpt-hdr-block {
+            background:var(--bg-panel);
+            border:1px solid var(--border);
+            border-radius:8px;
+            padding:17px 19px;
+            margin-bottom:16px;
+            box-shadow:var(--shadow);
+            transition:background .3s;
+        }
+        .rpt-title {
+            font-size:1.2em;
+            font-weight:700;
+            text-transform:uppercase;
+            letter-spacing:2px;
+            color:var(--text-pri);
+            text-align:center;
+            margin-bottom:13px;
+        }
+        .rpt-meta-row { display:flex; justify-content:space-between; align-items:center; gap:18px; }
+        .rpt-meta-text { font-size:.88em; color:var(--text-sec); line-height:1.8; }
         .rpt-meta-text strong { color:var(--text-pri); }
         .rpt-logo img { max-height:46px; max-width:145px; object-fit:contain; }
-
-        /* ── MISC ── */
         .divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:13px 0; }
-        .sec-lbl { font-family:var(--mono); font-size:0.69em; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:9px; display:flex; align-items:center; gap:8px; }
+        .sec-lbl {
+            font-family:var(--mono);
+            font-size:.69em;
+            letter-spacing:2px;
+            text-transform:uppercase;
+            color:var(--text-muted);
+            margin-bottom:9px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
         .sec-lbl::after { content:''; flex:1; height:1px; background:var(--border); }
+        .description-heading { margin-top:5px; display:flex; justify-content:space-between; align-items:center; }
+        #btn-regen { padding:3px 8px; font-size:.85em; margin:0; color:#7c5abf; border-color:rgba(124,90,191,0.35); }
 
-        /* ── RESPONSIVE (Placed BEFORE PDF Rules so PDF overrides it) ── */
         @media (max-width:700px) {
             .app-header { padding:10px 11px; height:auto; flex-wrap:wrap; gap:10px; }
             .header-right { width:100%; flex-wrap:wrap; justify-content:flex-end; }
             .theme-pill { margin-right:auto; margin-bottom:8px; }
             .header-actions { width:100%; display:flex; justify-content:space-between; gap:5px; }
-            .btn-hdr { flex:1; justify-content:center; padding:8px 2px; font-size:0.75em; }
+            .btn-hdr { flex:1; justify-content:center; padding:8px 2px; font-size:.75em; }
             .tp-label { display:none; }
             .main-layout { padding:11px 10px; }
             .g3, .g4 { grid-template-columns:1fr; }
             .snag-item { flex-direction:column; }
             .snag-photo-wrap { width:100%; min-width:unset; height:155px; border-right:none; border-bottom:1px solid var(--border); }
             #cropper-wrapper { height:250px; }
+            .upload-methods { flex-direction:column; }
         }
 
-        /* ─────────────────────────────────────────────
-           PDF PAGE RULES
-        ───────────────────────────────────────────── */
-        @page {
-            size: A4;
-            margin: 0.75in 0.4in 0.5in 0.4in;
-        }
-
-        /* ══════════════════════════════════════
-           PDF EXPORT MODE (CLEAN & STABLE)
-        ══════════════════════════════════════ */
+        @page { size:A4; margin:.75in .4in .5in .4in; }
         .pdf-export-mode {
-            width: 760px !important;
-            max-width: 760px !important;
-            min-width: 760px !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background-color: #fff !important;
-            color: #222 !important;
-            box-sizing: border-box !important;
+            width:760px !important;
+            max-width:760px !important;
+            min-width:760px !important;
+            margin:0 !important;
+            padding:0 !important;
+            background-color:#fff !important;
+            color:#222 !important;
+            box-sizing:border-box !important;
         }
-
         .pdf-export-mode .rpt-hdr-block {
-            background: #fdf8f0 !important;
-            border: 1px solid #d4c4a8 !important;
-            border-radius: 4px !important;
-            box-shadow: none !important;
-            padding: 16px !important;
-            margin-top: 0 !important;
-            margin-bottom: 16px !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
+            background:#fdf8f0 !important;
+            border:1px solid #d4c4a8 !important;
+            border-radius:4px !important;
+            box-shadow:none !important;
+            padding:16px !important;
+            margin-top:0 !important;
+            margin-bottom:16px !important;
+            width:100% !important;
+            box-sizing:border-box !important;
         }
-        .pdf-export-mode .rpt-title { color: #1a1208 !important; font-size: 15px !important; margin-bottom: 10px !important; }
-        .pdf-export-mode .rpt-meta-text { color: #3a2e1a !important; font-size: 11px !important; line-height: 1.7 !important; }
-        .pdf-export-mode .rpt-meta-text strong { color: #1a1208 !important; }
-        .pdf-export-mode .rpt-logo img { max-height: 42px !important; filter: none !important; }
-        .pdf-export-mode .divider { background: #c8baa0 !important; margin: 10px 0 !important; }
-
-        .pdf-export-mode .dash-wrap {
-            display: block !important;
-            width: 220px !important;
-            margin-bottom: 16px !important;
-        }
-        .pdf-export-mode .dash-card {
-            background: #f0ebe0 !important;
-            border: 1px solid #c8baa0 !important;
-            border-radius: 4px !important;
-            padding: 10px 14px !important;
-        }
-        .pdf-export-mode .dash-val { color: #1864c4 !important; font-size: 20px !important; }
-        .pdf-export-mode .dash-lbl { color: #6a5a3a !important; font-size: 9px !important; }
-
-        .pdf-export-mode .sec-lbl { color: #6a5a3a !important; font-size: 9px !important; margin-bottom: 8px !important; }
-        .pdf-export-mode .sec-lbl::after { background: #c8baa0 !important; }
-
-        .pdf-export-mode #snag-list { display: block !important; width: 100% !important; }
-
-        /* ─────────────────────────────────────────────
-           PDF TABLE LAYOUT
-        ───────────────────────────────────────────── */
+        .pdf-export-mode .rpt-title { color:#1a1208 !important; font-size:15px !important; margin-bottom:10px !important; }
+        .pdf-export-mode .rpt-meta-text { color:#3a2e1a !important; font-size:11px !important; line-height:1.7 !important; }
+        .pdf-export-mode .rpt-meta-text strong { color:#1a1208 !important; }
+        .pdf-export-mode .rpt-logo img { max-height:42px !important; filter:none !important; }
+        .pdf-export-mode .divider { background:#c8baa0 !important; margin:10px 0 !important; }
+        .pdf-export-mode .dash-wrap { display:block !important; width:220px !important; margin-bottom:16px !important; }
+        .pdf-export-mode .dash-card { background:#f0ebe0 !important; border:1px solid #c8baa0 !important; border-radius:4px !important; padding:10px 14px !important; }
+        .pdf-export-mode .dash-val { color:#1864c4 !important; font-size:20px !important; }
+        .pdf-export-mode .dash-lbl { color:#6a5a3a !important; font-size:9px !important; }
+        .pdf-export-mode .sec-lbl { color:#6a5a3a !important; font-size:9px !important; margin-bottom:8px !important; }
+        .pdf-export-mode .sec-lbl::after { background:#c8baa0 !important; }
+        .pdf-export-mode #snag-list { display:block !important; width:100% !important; }
         .pdf-export-mode .snag-item {
-            display: table !important;
-            width: 100% !important;
-            table-layout: fixed !important;
-            border-collapse: collapse !important;
-            background: #fff !important;
-            border: 1px solid #c8baa0 !important;
-            border-radius: 4px !important;
-            box-shadow: none !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            margin-bottom: 10px !important;
-            box-sizing: border-box !important;
+            display:table !important;
+            width:100% !important;
+            table-layout:fixed !important;
+            border-collapse:collapse !important;
+            background:#fff !important;
+            border:1px solid #c8baa0 !important;
+            border-radius:4px !important;
+            box-shadow:none !important;
+            page-break-inside:avoid !important;
+            break-inside:avoid !important;
+            margin-bottom:10px !important;
+            box-sizing:border-box !important;
         }
-
         .pdf-export-mode .snag-photo-wrap {
-            display: table-cell !important;
-            width: 200px !important;
-            vertical-align: middle !important;
-            text-align: center !important;
-            background: #fdf8f0 !important;
-            border-right: 1px solid #c8baa0 !important;
-            padding: 8px !important;
-            box-sizing: border-box !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            display:table-cell !important;
+            width:200px !important;
+            vertical-align:middle !important;
+            text-align:center !important;
+            background:#fdf8f0 !important;
+            border-right:1px solid #c8baa0 !important;
+            padding:8px !important;
+            box-sizing:border-box !important;
+            page-break-inside:avoid !important;
+            break-inside:avoid !important;
         }
-
         .pdf-export-mode .snag-photo {
-            max-width: 100% !important;
-            max-height: 160px !important;
-            width: auto !important;
-            height: auto !important;
-            object-fit: contain !important;
-            display: block !important;
-            margin: 0 auto !important;
+            max-width:100% !important;
+            max-height:160px !important;
+            width:auto !important;
+            height:auto !important;
+            object-fit:contain !important;
+            display:block !important;
+            margin:0 auto !important;
         }
-
-        .pdf-export-mode img {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-        }
-
-        .pdf-export-mode .no-img { color: #9a8868 !important; font-size: 9px !important; padding: 16px !important; display: block !important; text-align: center !important; }
-
+        .pdf-export-mode img { page-break-inside:avoid !important; break-inside:avoid !important; }
+        .pdf-export-mode .no-img { color:#9a8868 !important; font-size:9px !important; padding:16px !important; display:block !important; text-align:center !important; }
         .pdf-export-mode .snag-body {
-            display: table-cell !important;
-            vertical-align: top !important;
-            width: auto !important;
-            padding: 12px 14px !important;
-            box-sizing: border-box !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            display:table-cell !important;
+            vertical-align:top !important;
+            width:auto !important;
+            padding:12px 14px !important;
+            box-sizing:border-box !important;
+            page-break-inside:avoid !important;
+            break-inside:avoid !important;
         }
-
         .pdf-export-mode .snag-top {
-            display: block !important;
-            border-bottom: 1px solid #ddd !important;
-            margin-bottom: 8px !important;
-            padding-bottom: 6px !important;
+            display:block !important;
+            border-bottom:1px solid #ddd !important;
+            margin-bottom:8px !important;
+            padding-bottom:6px !important;
         }
-
-        .pdf-export-mode .snag-ref { color: #9a6800 !important; font-size: 13px !important; }
+        .pdf-export-mode .snag-ref { color:#9a6800 !important; font-size:13px !important; }
         .pdf-export-mode .snag-desc {
-            color: #2a1f0e !important;
-            font-size: 15px !important; 
-            line-height: 1.55 !important;
-            word-wrap: break-word !important;
-            overflow-wrap: break-word !important;
-            word-break: break-word !important;
-            white-space: normal !important;
-            display: block !important;
+            color:#2a1f0e !important;
+            font-size:15px !important;
+            line-height:1.55 !important;
+            word-wrap:break-word !important;
+            overflow-wrap:break-word !important;
+            word-break:break-word !important;
+            white-space:normal !important;
+            display:block !important;
         }
-
-        .pdf-export-mode .no-print { display: none !important; }
+        .pdf-export-mode .no-print { display:none !important; }
     </style>
 </head>
 <body>
-
     <header class="app-header">
         <div class="header-brand">
             <div class="header-icon">📋</div>
-            <div>
-                <div class="header-title">REPORT <span>GENERATOR</span></div>
-            </div>
+            <div class="header-title">REPORT <span>GENERATOR</span></div>
         </div>
         <div class="header-right">
             <div class="theme-pill no-print" onclick="toggleTheme()" title="Toggle theme">
@@ -382,7 +579,7 @@
             <div class="header-actions no-print">
                 <button class="btn-hdr" onclick="saveData()">💾 Save</button>
                 <input type="file" id="load-file" style="display:none;" accept=".json" onchange="loadData(event)">
-                <button class="btn-hdr" onclick="document.getElementById('load-file').click()">📂 Load</button>
+                <button class="btn-hdr" onclick="$('load-file').click()">📂 Load</button>
                 <button class="btn-hdr" onclick="exportPDF()">📄 PDF</button>
                 <button class="btn-hdr" onclick="exportExcel()">📊 Excel</button>
             </div>
@@ -390,7 +587,6 @@
     </header>
 
     <div class="main-layout" id="main-layout">
-
         <div class="panel no-print">
             <div class="panel-hdr">
                 <div class="phdr-dot"></div>
@@ -405,8 +601,7 @@
                 </div>
                 <div class="g3">
                     <div class="fg"><label>Snag ID Prefix</label><input type="text" id="report-prefix" value="ADCOOP-SN" oninput="updateReportHeader()"></div>
-                    <!-- Hidden because logo is now hardcoded in the script -->
-                    <div class="fg" style="grid-column:span 2; display: none;"><label>Logo Image URL</label><input type="text" id="report-logo" value="" oninput="updateReportHeader()"></div>
+                    <div class="fg" style="grid-column:span 2; display:none;"><label>Logo Image URL</label><input type="text" id="report-logo" value="" oninput="updateReportHeader()"></div>
                 </div>
             </div>
         </div>
@@ -418,23 +613,20 @@
             </div>
             <div class="panel-body">
                 <div class="sec-lbl">Photo</div>
-                
                 <div id="drop-zone" class="drop-zone">
                     <span class="dz-icon">📷</span>
                     <span class="dz-text">Drag &amp; Drop Photo Here</span>
-                    <span class="dz-sub" style="margin-bottom: 12px; display: block;">or choose an upload method</span>
-                    
-                    <div style="display: flex; justify-content: center; gap: 12px; position: relative; z-index: 5; width: 100%;">
-                        <label class="btn btn-ghost" style="padding: 12px 20px; font-size: 1.05em; cursor: pointer; margin: 0; flex: 1; text-align: center; justify-content: center;">
+                    <span class="dz-sub" style="margin-bottom:12px; display:block;">or choose an upload method</span>
+                    <div class="upload-methods">
+                        <label class="btn btn-ghost">
                             📸 Camera
                             <input type="file" id="snag-photo-cam" accept="image/*" capture="environment" style="display:none;">
                         </label>
-                        <label class="btn btn-ghost" style="padding: 12px 20px; font-size: 1.05em; cursor: pointer; margin: 0; flex: 1; text-align: center; justify-content: center;">
+                        <label class="btn btn-ghost">
                             🖼️ Gallery
                             <input type="file" id="snag-photo-gal" accept="image/*" style="display:none;">
                         </label>
                     </div>
-                    
                     <input type="file" id="snag-photo" accept="image/*" style="display:none;">
                 </div>
 
@@ -446,17 +638,18 @@
                             <button class="btn btn-ghost" onclick="rotateImage(90)">↻ Rotate Right</button>
                             <button class="btn btn-success" onclick="applyEditsAndSwitchToDraw()">✅ Apply &amp; Draw</button>
                         </div>
-                        <div id="cropper-wrapper"><img id="image-to-edit" style="max-width:100%;display:block;"></div>
+                        <div id="cropper-wrapper"><img id="image-to-edit" alt="Photo being edited"></div>
                     </div>
                     <div id="drawing-stage" style="display:none;">
-                        <div class="sec-lbl" style="margin-bottom:7px;">Draw on photo — Red Ink</div>
+                        <div class="sec-lbl" style="margin-bottom:7px;">Draw on photo - Red Ink</div>
                         <canvas id="markup-canvas"></canvas>
                         <button class="btn btn-danger" style="margin-top:8px;" onclick="undoDrawing()">↩ Undo Last Stroke</button>
                     </div>
                 </div>
-                <div class="sec-lbl" style="margin-top:5px; display: flex; justify-content: space-between; align-items: center;">
+
+                <div class="sec-lbl description-heading">
                     <span>Description</span>
-                    <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 0.85em; margin: 0; color: #7c5abf; border-color: rgba(124,90,191,0.35);" onclick="regenerateComment()" id="btn-regen" title="Use AI to enhance your description">✨ AI Regenerate</button>
+                    <button class="btn btn-ghost" onclick="regenerateComment()" id="btn-regen" title="Use AI to enhance your description">✨ AI Regenerate</button>
                 </div>
                 <div class="fg" style="margin-bottom:15px;">
                     <textarea id="snag-comment" placeholder="Describe the defect and required corrective action..."></textarea>
@@ -467,7 +660,7 @@
 
         <div class="filter-bar no-print">
             <label>🔍 Search</label>
-            <input type="text" id="filter-text" placeholder="Filter by description..." oninput="renderSnags()" style="max-width:420px;">
+            <input type="text" id="filter-text" placeholder="Filter by description..." style="max-width:420px;">
         </div>
 
         <div id="report-container">
@@ -480,7 +673,7 @@
                         <span class="sync-proj-mgr">PM: [Not Set]</span><br>
                         <span class="sync-proj-date">Date: [Not Set]</span>
                     </div>
-                    <div class="rpt-logo"><img id="display-logo" src="https://logo.clearbit.com/adcoop.com" alt="Logo"></div>
+                    <div class="rpt-logo"><img id="display-logo" src="./logo.png" alt="Logo"></div>
                 </div>
             </div>
             <div class="dash-wrap" style="margin-bottom:16px;">
@@ -492,185 +685,481 @@
             <div class="sec-lbl" style="margin-bottom:12px;">Observation Register</div>
             <div id="snag-list"></div>
         </div>
-
     </div>
 
     <script>
-        // ============================================================================
-        // 🔹 HARDCODED COMPANY LOGO URL
-        // Paste your Option 4 Base64 string between the quotes below to hardcode it!
-        // ============================================================================
         const HARDCODED_COMPANY_LOGO_URL = "./logo.png";
+        const IMAGE_MAX = 1600;
+        const JPEG_QUALITY = 0.82;
+        const UNDO_LIMIT = 8;
 
-        let snagData=[], snagCounter=1, editingSnagId=null;
-        let hasUnsavedChanges=false, currentRawImage=null;
-        let cropper=null, isDrawing=false;
-        const imageToEdit=document.getElementById('image-to-edit');
-        const canvas=document.getElementById('markup-canvas');
-        const ctx=canvas.getContext('2d');
-        let drawingBaseImage=new Image(), undoStack=[];
+        const $ = (id) => document.getElementById(id);
 
-        window.addEventListener('beforeunload',e=>{if(hasUnsavedChanges){e.preventDefault();e.returnValue='';}});
+        let snagData = [];
+        let snagCounter = 1;
+        let editingSnagId = null;
+        let hasUnsavedChanges = false;
+        let currentRawImage = null;
+        let cropper = null;
+        let isDrawing = false;
+        let drawingBaseImage = new Image();
+        let undoStack = [];
 
-        /* ── THEME ── */
-        function toggleTheme(){const h=document.documentElement,next=h.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(next);localStorage.setItem('snagTheme',next);}
-        function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('theme-icon').textContent=t==='dark'?'🌙':'☀️';document.getElementById('theme-label').textContent=t==='dark'?'Dark':'Light';}
+        const imageToEdit = $('image-to-edit');
+        const canvas = $('markup-canvas');
+        const ctx = canvas.getContext('2d');
 
-        /* ── XSS ── */
-        function escapeHTML(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
-
-        /* ── DRAG & DROP ── */
-        const dropZone=document.getElementById('drop-zone');
-        dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
-        dropZone.addEventListener('dragleave',e=>{e.preventDefault();dropZone.classList.remove('drag-over');});
-        dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files.length){document.getElementById('snag-photo').files=e.dataTransfer.files;document.getElementById('snag-photo').dispatchEvent(new Event('change'));}});
-
-        /* ── PHOTO UPLOAD LOGIC ── */
-        const processPhoto = function(e) {
-            if(!e.target.files.length){resetEditorUI();return;}
-            const url=URL.createObjectURL(e.target.files[0]);
-            const img=new Image();
-            img.onload=()=>{
-                const MAX=2000,scale=Math.min(MAX/img.width,MAX/img.height,1);
-                const tc=document.createElement('canvas');tc.width=img.width*scale;tc.height=img.height*scale;
-                const tx=tc.getContext('2d');tx.imageSmoothingEnabled=true;tx.imageSmoothingQuality='high';
-                tx.drawImage(img,0,0,tc.width,tc.height);
-                currentRawImage=tc.toDataURL('image/jpeg',1.0);
-                document.getElementById('btn-markup').style.display='inline-flex';
-                document.getElementById('markup-container').style.display='none';
-                URL.revokeObjectURL(url);
+        function debounce(fn, wait = 150) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), wait);
             };
-            img.src=url;
-            e.target.value = ''; 
+        }
+
+        function markDirty() {
+            hasUnsavedChanges = true;
+        }
+
+        function findSnagIndex(id) {
+            return snagData.findIndex((snag) => snag.id === id);
+        }
+
+        function escapeHTML(s) {
+            if (!s) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatDateForDisplay(rawDate) {
+            if (!rawDate) return '';
+            const parts = rawDate.split('-');
+            return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : rawDate;
+        }
+
+        function collectProjectData() {
+            return {
+                reportTitle: $('report-title').value,
+                projName: $('proj-name').value,
+                projDate: $('proj-date').value,
+                projManager: $('proj-manager').value,
+                reportPrefix: $('report-prefix').value,
+                snags: snagData,
+                counter: snagCounter
+            };
+        }
+
+        function restoreProjectData(data) {
+            $('report-title').value = data.reportTitle || '';
+            $('proj-name').value = data.projName || '';
+            $('proj-date').value = data.projDate || '';
+            $('proj-manager').value = data.projManager || '';
+            $('report-prefix').value = data.reportPrefix || 'ADCOOP-SN';
+            snagData = Array.isArray(data.snags) ? data.snags : [];
+            snagCounter = Number(data.counter) || snagData.length + 1;
+            updateReportHeader(false);
+            renderSnags();
+        }
+
+        window.addEventListener('beforeunload', (e) => {
+            if (!hasUnsavedChanges) return;
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+            localStorage.setItem('snagTheme', next);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            $('theme-icon').textContent = theme === 'dark' ? '🌙' : '☀️';
+            $('theme-label').textContent = theme === 'dark' ? 'Dark' : 'Light';
+        }
+
+        const dropZone = $('drop-zone');
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (!e.dataTransfer.files.length) return;
+            $('snag-photo').files = e.dataTransfer.files;
+            $('snag-photo').dispatchEvent(new Event('change'));
+        });
+
+        const processPhoto = function(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) {
+                resetEditorUI();
+                return;
+            }
+
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+
+            img.onload = () => {
+                const scale = Math.min(IMAGE_MAX / img.width, IMAGE_MAX / img.height, 1);
+                const width = Math.round(img.width * scale);
+                const height = Math.round(img.height * scale);
+
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.imageSmoothingEnabled = true;
+                tempCtx.imageSmoothingQuality = 'high';
+                tempCtx.drawImage(img, 0, 0, width, height);
+
+                currentRawImage = tempCanvas.toDataURL('image/jpeg', JPEG_QUALITY);
+                $('btn-markup').style.display = 'inline-flex';
+                $('markup-container').style.display = 'none';
+                URL.revokeObjectURL(url);
+                e.target.value = '';
+                markDirty();
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                alert("Could not load this image.");
+            };
+
+            img.src = url;
         };
 
-        document.getElementById('snag-photo').addEventListener('change', processPhoto);
-        document.getElementById('snag-photo-cam').addEventListener('change', processPhoto);
-        document.getElementById('snag-photo-gal').addEventListener('change', processPhoto);
+        $('snag-photo').addEventListener('change', processPhoto);
+        $('snag-photo-cam').addEventListener('change', processPhoto);
+        $('snag-photo-gal').addEventListener('change', processPhoto);
+        $('filter-text').addEventListener('input', debounce(renderSnags, 150));
 
-        /* ── MARKUP EDITOR ── */
-        function showEditor(){if(!currentRawImage)return;document.getElementById('markup-container').style.display='block';document.getElementById('cropper-stage').style.display='block';document.getElementById('drawing-stage').style.display='none';document.getElementById('btn-markup').style.display='none';imageToEdit.src=currentRawImage;imageToEdit.onload=()=>{if(cropper)cropper.destroy();cropper=new Cropper(imageToEdit,{viewMode:1,dragMode:'move',autoCropArea:1,restore:false,guides:false,center:false,highlight:false,cropBoxMovable:true,cropBoxResizable:true,toggleDragModeOnDblclick:false});};}
-        function rotateImage(d){if(cropper)cropper.rotate(d);}
-        function applyEditsAndSwitchToDraw(){if(!cropper)return;const edited=cropper.getCroppedCanvas({maxWidth:2000,maxHeight:2000}).toDataURL('image/jpeg',1.0);document.getElementById('cropper-stage').style.display='none';document.getElementById('drawing-stage').style.display='block';drawingBaseImage.onload=()=>{canvas.width=drawingBaseImage.width;canvas.height=drawingBaseImage.height;ctx.drawImage(drawingBaseImage,0,0,canvas.width,canvas.height);cropper.destroy();cropper=null;undoStack=[];};drawingBaseImage.src=edited;}
-        function undoDrawing(){if(undoStack.length){const img=new Image();img.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0);};img.src=undoStack.pop();}else{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(drawingBaseImage,0,0,canvas.width,canvas.height);undoStack=[];}}
-        function getPos(e){const r=canvas.getBoundingClientRect(),cx=e.clientX||(e.touches&&e.touches[0].clientX),cy=e.clientY||(e.touches&&e.touches[0].clientY);return{x:(cx-r.left)*(canvas.width/r.width),y:(cy-r.top)*(canvas.height/r.height)};}
-        function startDraw(e){isDrawing=true;undoStack.push(canvas.toDataURL('image/jpeg',1));draw(e);}
-        function stopDraw(){isDrawing=false;ctx.beginPath();}
-        function draw(e){if(!isDrawing)return;e.preventDefault();const p=getPos(e);ctx.lineWidth=Math.max(5, canvas.width * 0.0125);ctx.lineCap='round';ctx.strokeStyle=document.documentElement.getAttribute('data-theme')==='dark'?'#f04060':'#c02236';ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);}
-        canvas.addEventListener('mousedown',startDraw);canvas.addEventListener('mouseup',stopDraw);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseout',stopDraw);
-        canvas.addEventListener('touchstart',startDraw,{passive:false});canvas.addEventListener('touchend',stopDraw);canvas.addEventListener('touchmove',draw,{passive:false});
-
-        function resetEditorUI(){
-            currentRawImage=null;
-            document.getElementById('btn-markup').style.display='none';
-            document.getElementById('markup-container').style.display='none';
-            document.getElementById('snag-photo').value='';
-            document.getElementById('snag-photo-cam').value='';
-            document.getElementById('snag-photo-gal').value='';
-            undoStack=[];
-            if(cropper){cropper.destroy();cropper=null;}
+        function showEditor() {
+            if (!currentRawImage) return;
+            $('markup-container').style.display = 'block';
+            $('cropper-stage').style.display = 'block';
+            $('drawing-stage').style.display = 'none';
+            $('btn-markup').style.display = 'none';
+            imageToEdit.src = currentRawImage;
+            imageToEdit.onload = () => {
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(imageToEdit, {
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    restore: false,
+                    guides: false,
+                    center: false,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false
+                });
+            };
         }
 
-        /* ── REPORT HEADER ── */
-        function updateReportHeader(){
-            let rd=document.getElementById('proj-date').value,fd=rd;
-            if(rd){const p=rd.split('-');if(p.length===3)fd=`${p[2]}/${p[1]}/${p[0]}`;}
-            
-            const titleVal = document.getElementById('report-title').value || 'SNAG REPORT';
-            document.querySelectorAll('.sync-rpt-title').forEach(el=>el.innerText=titleVal);
-            
-            document.querySelectorAll('.sync-proj-name').forEach(el=>el.innerText='Project: '+(document.getElementById('proj-name').value||'[Not Set]'));
-            document.querySelectorAll('.sync-proj-mgr').forEach(el=>el.innerText='PM: '+(document.getElementById('proj-manager').value||'[Not Set]'));
-            document.querySelectorAll('.sync-proj-date').forEach(el=>el.innerText='Date: '+(fd||'[Not Set]'));
-            const logo=HARDCODED_COMPANY_LOGO_URL;
-            const el=document.getElementById('display-logo');if(el)el.src=logo;
-            hasUnsavedChanges=true;
+        function rotateImage(degrees) {
+            if (cropper) cropper.rotate(degrees);
         }
 
-        /* ── ADD / EDIT ── */
+        function applyEditsAndSwitchToDraw() {
+            if (!cropper) return;
+            const edited = cropper.getCroppedCanvas({
+                maxWidth: IMAGE_MAX,
+                maxHeight: IMAGE_MAX,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            }).toDataURL('image/jpeg', JPEG_QUALITY);
+
+            $('cropper-stage').style.display = 'none';
+            $('drawing-stage').style.display = 'block';
+
+            drawingBaseImage.onload = () => {
+                canvas.width = drawingBaseImage.width;
+                canvas.height = drawingBaseImage.height;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(drawingBaseImage, 0, 0, canvas.width, canvas.height);
+                cropper.destroy();
+                cropper = null;
+                undoStack = [];
+            };
+            drawingBaseImage.src = edited;
+            markDirty();
+        }
+
+        function undoDrawing() {
+            if (undoStack.length) {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = undoStack.pop();
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(drawingBaseImage, 0, 0, canvas.width, canvas.height);
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const point = e.touches ? e.touches[0] : e;
+            return {
+                x: (point.clientX - rect.left) * (canvas.width / rect.width),
+                y: (point.clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            if (undoStack.length >= UNDO_LIMIT) undoStack.shift();
+            undoStack.push(canvas.toDataURL('image/jpeg', JPEG_QUALITY));
+            draw(e);
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getPos(e);
+            ctx.lineWidth = Math.max(5, canvas.width * 0.0125);
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? '#f04060' : '#c02236';
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            markDirty();
+        }
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseout', stopDraw);
+        canvas.addEventListener('touchstart', startDraw, { passive: false });
+        canvas.addEventListener('touchend', stopDraw);
+        canvas.addEventListener('touchcancel', stopDraw);
+        canvas.addEventListener('touchmove', draw, { passive: false });
+
+        function resetEditorUI() {
+            currentRawImage = null;
+            $('btn-markup').style.display = 'none';
+            $('markup-container').style.display = 'none';
+            $('snag-photo').value = '';
+            $('snag-photo-cam').value = '';
+            $('snag-photo-gal').value = '';
+            undoStack = [];
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateReportHeader(markChanged = true) {
+            const formattedDate = formatDateForDisplay($('proj-date').value);
+            const titleValue = $('report-title').value || 'SNAG REPORT';
+
+            document.querySelectorAll('.sync-rpt-title').forEach((el) => { el.innerText = titleValue; });
+            document.querySelectorAll('.sync-proj-name').forEach((el) => { el.innerText = 'Project: ' + ($('proj-name').value || '[Not Set]'); });
+            document.querySelectorAll('.sync-proj-mgr').forEach((el) => { el.innerText = 'PM: ' + ($('proj-manager').value || '[Not Set]'); });
+            document.querySelectorAll('.sync-proj-date').forEach((el) => { el.innerText = 'Date: ' + (formattedDate || '[Not Set]'); });
+
+            const logo = $('display-logo');
+            if (logo) logo.src = HARDCODED_COMPANY_LOGO_URL;
+            if (markChanged) markDirty();
+        }
+
         function regenerateComment() {
-            const ci = document.getElementById('snag-comment');
-            const btn = document.getElementById('btn-regen');
-            let text = ci.value.trim();
-            if(!text && !currentRawImage) {
+            const commentInput = $('snag-comment');
+            const button = $('btn-regen');
+            const text = commentInput.value.trim();
+
+            if (!text && !currentRawImage) {
                 alert("Please add a basic description or a photo first for the AI to enhance.");
                 return;
             }
-            
-            btn.innerHTML = "⏳ Enhancing...";
-            btn.disabled = true;
-            
+
+            button.innerHTML = "⏳ Enhancing...";
+            button.disabled = true;
+
             setTimeout(() => {
-                if(!text) {
-                    ci.value = "Observation: An anomaly has been detected in the uploaded image requiring immediate attention and rectification as per project specifications.";
+                if (!text) {
+                    commentInput.value = "Observation: An anomaly has been detected in the uploaded image requiring immediate attention and rectification as per project specifications.";
                 } else {
-                    // Capitalize first letter and format
                     const formattedText = text.charAt(0).toUpperCase() + text.slice(1);
-                    ci.value = `Observation: ${formattedText}\n\nAction Required: The contractor is instructed to review the aforementioned defect and perform necessary rectifications to ensure compliance with approved drawings and FLS standards.`;
+                    commentInput.value = `Observation: ${formattedText}\n\nAction Required: The contractor is instructed to review the aforementioned defect and perform necessary rectifications to ensure compliance with approved drawings and FLS standards.`;
                 }
-                btn.innerHTML = "✨ AI Regenerate";
-                btn.disabled = false;
-                hasUnsavedChanges = true;
-            }, 800);
+                button.innerHTML = "✨ AI Regenerate";
+                button.disabled = false;
+                markDirty();
+            }, 500);
         }
 
-        function addSnag(){
-            const ci=document.getElementById('snag-comment');
-            if(!ci.value.trim()&&!currentRawImage){alert("Add a description or photo.");return;}
-            let img=null;
-            if(currentRawImage){if(document.getElementById('markup-container').style.display==='block'){if(document.getElementById('drawing-stage').style.display==='block'){img=canvas.toDataURL('image/jpeg',1.0);}else{alert("Click 'Apply & Draw' first.");return;}}else{img=currentRawImage;}}
-            if(editingSnagId!==null){snagData[editingSnagId-1].image=img;snagData[editingSnagId-1].comment=ci.value;editingSnagId=null;document.getElementById('btn-add-snag').innerText='+ Add Observation';}
-            else{snagData.push({id:snagCounter++,image:img,comment:ci.value});}
-            ci.value='';resetEditorUI();hasUnsavedChanges=true;renderSnags();
+        function addSnag() {
+            const commentInput = $('snag-comment');
+            const comment = commentInput.value.trim();
+
+            if (!comment && !currentRawImage) {
+                alert("Add a description or photo.");
+                return;
+            }
+
+            let image = null;
+            if (currentRawImage) {
+                const markupVisible = $('markup-container').style.display === 'block';
+                const drawingVisible = $('drawing-stage').style.display === 'block';
+                image = markupVisible && drawingVisible
+                    ? canvas.toDataURL('image/jpeg', JPEG_QUALITY)
+                    : currentRawImage;
+            }
+
+            if (editingSnagId !== null) {
+                const index = findSnagIndex(editingSnagId);
+                if (index === -1) {
+                    alert("Could not find the observation being edited.");
+                    return;
+                }
+                snagData[index].image = image;
+                snagData[index].comment = commentInput.value;
+                editingSnagId = null;
+                $('btn-add-snag').innerText = '+ Add Observation';
+            } else {
+                snagData.push({ id: snagCounter++, image, comment: commentInput.value });
+            }
+
+            commentInput.value = '';
+            resetEditorUI();
+            markDirty();
+            renderSnags();
         }
 
-        function editSnag(id){
-            const snag=snagData[id-1];document.getElementById('snag-comment').value=snag.comment||'';
-            if(snag.image){currentRawImage=snag.image;document.getElementById('markup-container').style.display='block';document.getElementById('cropper-stage').style.display='block';document.getElementById('drawing-stage').style.display='none';document.getElementById('btn-markup').style.display='none';imageToEdit.src=currentRawImage;imageToEdit.onload=()=>{if(cropper)cropper.destroy();cropper=new Cropper(imageToEdit,{viewMode:1,dragMode:'move',autoCropArea:1,restore:false,guides:false,center:false,highlight:false,cropBoxMovable:true,cropBoxResizable:true,toggleDragModeOnDblclick:false});};}
-            else{resetEditorUI();}
-            editingSnagId=id;document.getElementById('btn-add-snag').innerText='💾 Update Observation';
-            const panels=document.querySelectorAll('.panel.no-print');if(panels[1])window.scrollTo({top:panels[1].offsetTop-75,behavior:'smooth'});
+        function editSnag(id) {
+            const index = findSnagIndex(id);
+            if (index === -1) return;
+
+            const snag = snagData[index];
+            $('snag-comment').value = snag.comment || '';
+
+            if (snag.image) {
+                currentRawImage = snag.image;
+                $('btn-markup').style.display = 'inline-flex';
+                $('markup-container').style.display = 'none';
+            } else {
+                resetEditorUI();
+            }
+
+            editingSnagId = id;
+            $('btn-add-snag').innerText = '💾 Update Observation';
+            const panels = document.querySelectorAll('.panel.no-print');
+            if (panels[1]) window.scrollTo({ top: panels[1].offsetTop - 75, behavior: 'smooth' });
         }
 
-        function deleteSnag(id){if(!confirm('Remove this snag?'))return;snagData.splice(id-1,1);snagData.forEach((s,i)=>s.id=i+1);snagCounter=snagData.length+1;hasUnsavedChanges=true;renderSnags();}
-
-        /* ── RENDER ── */
-        function renderSnags(){
-            const lc=document.getElementById('snag-list');
-            const prefix=document.getElementById('report-prefix').value||'ADCOOP-SN';
-            const ft=document.getElementById('filter-text').value.toLowerCase();
-            let html='';
-            snagData.forEach(s=>{
-                if(ft&&!(s.comment||'').toLowerCase().includes(ft))return;
-                const ref=`${escapeHTML(prefix)}-${String(s.id).padStart(3,'0')}`;
-                const safe=escapeHTML(s.comment||'').replace(/\n/g,'<br>');
-                const imgH=s.image?`<img src="${s.image}" alt="Snag Photo" class="snag-photo">`:`<div class="no-img">NO IMAGE</div>`;
-                html+=`<div class="snag-item"><div class="snag-photo-wrap">${imgH}</div><div class="snag-body"><div class="snag-top"><span class="snag-ref">${ref}</span></div><div class="snag-desc">${safe||'<em style="color:var(--text-muted)">No description provided.</em>'}</div><div class="snag-acts no-print"><button class="btn btn-edit" onclick="editSnag(${s.id})">✏️ Edit</button><button class="btn btn-danger" onclick="deleteSnag(${s.id})">🗑 Remove</button></div></div></div>`;
-            });
-            lc.innerHTML=html||`<div style="text-align:center;padding:38px;color:var(--text-muted);font-family:var(--mono);font-size:0.82em;letter-spacing:1px;">NO OBSERVATIONS LOGGED YET</div>`;
-            document.getElementById('dash-total').innerText=snagData.length;
+        function deleteSnag(id) {
+            if (!confirm('Remove this observation?')) return;
+            const index = findSnagIndex(id);
+            if (index === -1) return;
+            snagData.splice(index, 1);
+            markDirty();
+            renderSnags();
         }
 
-        /* ── SAVE / LOAD ── */
-        function saveData(){const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};const a=document.createElement('a');a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(d));a.download=(d.projName||'project')+'_snags.json';document.body.appendChild(a);a.click();a.remove();hasUnsavedChanges=false;localStorage.removeItem("snagProject");}
-        function loadData(event){const file=event.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});updateReportHeader();snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();hasUnsavedChanges=false;event.target.value='';}catch(err){alert("Error loading file.");}};r.readAsText(file);}
+        function renderSnags() {
+            const list = $('snag-list');
+            const prefix = $('report-prefix').value || 'ADCOOP-SN';
+            const filterText = $('filter-text').value.toLowerCase();
+            const visibleSnags = snagData.filter((snag) => !filterText || (snag.comment || '').toLowerCase().includes(filterText));
 
-        /* ── LOGO HELPER ── */
+            list.innerHTML = visibleSnags.map((snag) => {
+                const ref = `${escapeHTML(prefix)}-${String(snag.id).padStart(3, '0')}`;
+                const safeComment = escapeHTML(snag.comment || '').replace(/\n/g, '<br>');
+                const imageHtml = snag.image
+                    ? `<img src="${snag.image}" alt="Observation Photo" class="snag-photo">`
+                    : `<div class="no-img">NO IMAGE</div>`;
+
+                return `
+                    <div class="snag-item">
+                        <div class="snag-photo-wrap">${imageHtml}</div>
+                        <div class="snag-body">
+                            <div class="snag-top"><span class="snag-ref">${ref}</span></div>
+                            <div class="snag-desc">${safeComment || '<em style="color:var(--text-muted)">No description provided.</em>'}</div>
+                            <div class="snag-acts no-print">
+                                <button class="btn btn-edit" onclick="editSnag(${snag.id})">✏️ Edit</button>
+                                <button class="btn btn-danger" onclick="deleteSnag(${snag.id})">🗑 Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (!visibleSnags.length) {
+                list.innerHTML = `<div style="text-align:center;padding:38px;color:var(--text-muted);font-family:var(--mono);font-size:.82em;letter-spacing:1px;">NO OBSERVATIONS LOGGED YET</div>`;
+            }
+
+            $('dash-total').innerText = snagData.length;
+        }
+
+        function saveData() {
+            const data = collectProjectData();
+            const anchor = document.createElement('a');
+            anchor.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+            anchor.download = (data.projName || 'project') + '_snags.json';
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            hasUnsavedChanges = false;
+            localStorage.removeItem("snagProject");
+        }
+
+        function loadData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    restoreProjectData(JSON.parse(e.target.result));
+                    hasUnsavedChanges = false;
+                    event.target.value = '';
+                } catch (err) {
+                    alert("Error loading file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
         async function getLogoBase64() {
             const logoUrl = HARDCODED_COMPANY_LOGO_URL;
             if (!logoUrl) return null;
+
             return new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = 'Anonymous';
                 img.onload = () => {
                     try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0);
-                        resolve(canvas.toDataURL('image/png'));
-                    } catch(e) {
+                        const logoCanvas = document.createElement('canvas');
+                        logoCanvas.width = img.width;
+                        logoCanvas.height = img.height;
+                        logoCanvas.getContext('2d').drawImage(img, 0, 0);
+                        resolve(logoCanvas.toDataURL('image/png'));
+                    } catch (e) {
                         resolve(logoUrl.startsWith('data:') ? logoUrl : null);
                     }
                 };
@@ -681,242 +1170,274 @@
             });
         }
 
-        /* ── EXPORT PDF (MANUAL ASSEMBLY, 4 PER PAGE) ── */
-        async function exportPDF(){
-            const ti=document.getElementById('report-title');
-            if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
+        async function exportPDF() {
+            if (snagData.length === 0) {
+                alert("No observations to export. Please add at least one observation.");
+                return;
+            }
+
+            const titleInput = $('report-title');
+            if (!titleInput.value.trim()) {
+                const title = prompt("Enter report title:", "");
+                if (title === null) return;
+                titleInput.value = title.trim();
+                updateReportHeader();
+            }
 
             window.scrollTo(0, 0);
 
-            document.querySelectorAll('.no-print').forEach(el=>el.style.display='none');
-            const container=document.getElementById('report-container');
-            container.classList.add('pdf-export-mode');
-
-            const titleToPrint = document.getElementById('report-title').value || 'SNAG REPORT';
-            const proj=document.getElementById('proj-name').value||'[Not Set]';
-            const pm=document.getElementById('proj-manager').value||'[Not Set]';
-            const dateEl=document.querySelector('.sync-proj-date');
-            const dt=dateEl?dateEl.innerText.replace('Date: ',''):'[Not Set]';
-
-            // Wait for PDF-mode styles to reflow
-            await new Promise(r => setTimeout(r, 300));
-
-            // Setup loading state (optional but good practice)
-            const origCursor = document.body.style.cursor;
-            document.body.style.cursor = 'wait';
-
-            let origLogoSrc = null;
+            const noPrintElements = Array.from(document.querySelectorAll('.no-print'));
+            const previousDisplays = new Map(noPrintElements.map((el) => [el, el.style.display]));
+            const container = $('report-container');
+            const originalCursor = document.body.style.cursor;
+            let originalLogoSrc = null;
 
             try {
-                // Abort if no snags
-                const origSnagList = container.querySelector('#snag-list') || container.querySelector('#snag-list-hidden');
-                if (!origSnagList) throw new Error("List not found");
-                const snagItems = Array.from(origSnagList.querySelectorAll('.snag-item'));
-                if (snagItems.length === 0) {
-                    alert("No observations to export. Please add at least one snag.");
-                    return;
-                }
+                noPrintElements.forEach((el) => { el.style.display = 'none'; });
+                container.classList.add('pdf-export-mode');
+                document.body.style.cursor = 'wait';
 
-                // Pre-fetch logo to guarantee rendering without canvas CORS taints
+                const titleToPrint = titleInput.value || 'SNAG REPORT';
+                const projectName = $('proj-name').value || '[Not Set]';
+                const projectManager = $('proj-manager').value || '[Not Set]';
+                const reportDate = formatDateForDisplay($('proj-date').value) || '[Not Set]';
+
+                await new Promise((resolve) => setTimeout(resolve, 200));
+
+                const originalSnagList = container.querySelector('#snag-list');
+                const snagItems = Array.from(originalSnagList.querySelectorAll('.snag-item'));
                 const logoBase64 = await getLogoBase64();
-                const displayLogo = document.getElementById('display-logo');
-                origLogoSrc = displayLogo ? displayLogo.src : null;
+                const displayLogo = $('display-logo');
+                originalLogoSrc = displayLogo ? displayLogo.src : null;
                 if (displayLogo && logoBase64) displayLogo.src = logoBase64;
 
-                // We will manually assemble the PDF page by page to avoid all slicing bugs.
-                const pdf = new window.jspdf.jsPDF({unit: 'pt', format: 'a4', orientation: 'p'});
-                const PDF_W = pdf.internal.pageSize.getWidth(); // 595.28 pt
-                const PDF_H = pdf.internal.pageSize.getHeight(); // 841.89 pt
-                const MARGIN_TOP = 40;
-                
-                // Group snags exactly 4 per page
-                const ITEMS_PER_PAGE = 4;
+                const pdf = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4', orientation: 'p' });
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const marginX = 25;
+                const itemsPerPage = 4;
                 const chunks = [];
-                for(let i=0; i<snagItems.length; i+=ITEMS_PER_PAGE) {
-                    chunks.push(snagItems.slice(i, i+ITEMS_PER_PAGE));
+
+                for (let i = 0; i < snagItems.length; i += itemsPerPage) {
+                    chunks.push(snagItems.slice(i, i + itemsPerPage));
                 }
 
-                // Hide original list securely so it's not rendered
-                origSnagList.id = 'snag-list-hidden';
-                origSnagList.style.setProperty('display', 'none', 'important');
-                
-                // We also need to hide the header block temporarily when rendering subsequent pages
+                originalSnagList.id = 'snag-list-hidden';
+                originalSnagList.style.setProperty('display', 'none', 'important');
+
                 const headerBlock = container.querySelector('.rpt-hdr-block');
                 const dashboard = container.querySelector('.dash-wrap');
                 const sectionLabel = container.querySelector('.sec-lbl');
 
-                // Render each chunk as a separate page
                 for (let i = 0; i < chunks.length; i++) {
                     if (i > 0) {
                         pdf.addPage();
-                        // Hide header/dashboard on pages 2+
-                        if(headerBlock) headerBlock.style.display = 'none';
-                        if(dashboard) dashboard.style.display = 'none';
-                        if(sectionLabel) sectionLabel.style.display = 'none';
+                        if (headerBlock) headerBlock.style.display = 'none';
+                        if (dashboard) dashboard.style.display = 'none';
+                        if (sectionLabel) sectionLabel.style.display = 'none';
                     }
 
-                    // Create a temporary container for this page's snags
                     const pageSnagsContainer = document.createElement('div');
                     pageSnagsContainer.style.cssText = 'display:flex; flex-direction:column; width:100%;';
-                    
-                    chunks[i].forEach(item => {
+
+                    chunks[i].forEach((item) => {
                         const clone = item.cloneNode(true);
                         clone.style.marginBottom = '10px';
                         pageSnagsContainer.appendChild(clone);
                     });
-                    
+
                     container.appendChild(pageSnagsContainer);
 
-                    // Capture the container (which now only holds header + this page's snags)
-                    const canvas = await html2canvas(container, {
-                        scale: 3, // Safely increased to 3x for sharper PDF images without hitting memory limits
+                    const renderedCanvas = await html2canvas(container, {
+                        scale: 2,
                         useCORS: true,
                         backgroundColor: '#ffffff',
                         width: 760,
                         windowWidth: 800
                     });
 
-                    // Remove the temp container
                     pageSnagsContainer.remove();
 
-                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
-                    const imgProps = pdf.getImageProperties(imgData);
-                    
-                    // Render width is slightly less than page width to provide left/right margins.
-                    const MARGIN_X = 25; // approx 0.35 inch
-                    const renderW = PDF_W - (MARGIN_X * 2);
-                    const renderH = (imgProps.height * renderW) / imgProps.width;
-                    
-                    // If it's page 2+, draw the continuation header natively in jsPDF
-                    let yPos = MARGIN_X; // small top margin for first page
-                    if (i > 0) {
-                        yPos = MARGIN_TOP + 15; // Shift image down to make room for header
-                        pdf.setFontSize(11); pdf.setTextColor(44,62,80); pdf.setFont('helvetica','bold');
-                        pdf.text(titleToPrint.toUpperCase(), MARGIN_X, 30);
-                        pdf.setFontSize(9); pdf.setFont('helvetica','normal');
-                        pdf.text(`Project: ${proj}   |   PM: ${pm}   |   Date: ${dt}`, MARGIN_X, 45);
-                        pdf.setDrawColor(212,196,168); pdf.setLineWidth(0.5);
-                        pdf.line(MARGIN_X, 52, PDF_W - MARGIN_X, 52);
+                    const imageData = renderedCanvas.toDataURL('image/jpeg', 0.92);
+                    const imageProps = pdf.getImageProperties(imageData);
+                    const renderWidth = pdfWidth - (marginX * 2);
+                    const renderHeight = (imageProps.height * renderWidth) / imageProps.width;
+                    let yPos = marginX;
 
-                        // Draw logo in the native header if available
+                    if (i > 0) {
+                        yPos = 55;
+                        pdf.setFontSize(11);
+                        pdf.setTextColor(44, 62, 80);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(titleToPrint.toUpperCase(), marginX, 30);
+                        pdf.setFontSize(9);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`Project: ${projectName}   |   PM: ${projectManager}   |   Date: ${reportDate}`, marginX, 45);
+                        pdf.setDrawColor(212, 196, 168);
+                        pdf.setLineWidth(0.5);
+                        pdf.line(marginX, 52, pdfWidth - marginX, 52);
+
                         if (logoBase64) {
                             try {
                                 const props = pdf.getImageProperties(logoBase64);
-                                const logoH = 22; // max height in pt
-                                const logoW = (props.width * logoH) / props.height;
-                                const imgType = logoBase64.includes('png') ? 'PNG' : 'JPEG';
-                                pdf.addImage(logoBase64, imgType, PDF_W - MARGIN_X - logoW, 20, logoW, logoH);
-                            } catch(e) {}
+                                const logoHeight = 22;
+                                const logoWidth = (props.width * logoHeight) / props.height;
+                                const imageType = logoBase64.includes('png') ? 'PNG' : 'JPEG';
+                                pdf.addImage(logoBase64, imageType, pdfWidth - marginX - logoWidth, 20, logoWidth, logoHeight);
+                            } catch (e) {}
                         }
                     }
-                    
-                    pdf.addImage(imgData, 'JPEG', MARGIN_X, yPos, renderW, renderH);
 
-                    // Draw footer (Page X of Y)
-                    pdf.setFontSize(10); pdf.setTextColor(100); pdf.setFont('helvetica','normal');
-                    pdf.text(`Page ${i + 1} of ${chunks.length}`, PDF_W / 2, PDF_H - 20, {align:'center'});
+                    pdf.addImage(imageData, 'JPEG', marginX, yPos, renderWidth, renderHeight);
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(`Page ${i + 1} of ${chunks.length}`, pdfWidth / 2, pdfHeight - 20, { align: 'center' });
                 }
 
-                // Save PDF
-                const filename = ((document.getElementById('report-title').value || 'Report').replace(/[^a-z0-9]/gi, '_')) + '.pdf';
+                const filename = (titleInput.value || 'Report').replace(/[^a-z0-9]/gi, '_') + '.pdf';
                 pdf.save(filename);
-                
             } catch (err) {
                 console.error("PDF Export error:", err);
                 alert("An error occurred generating the PDF. See console.");
             } finally {
-                document.body.style.cursor = origCursor;
-                
-                // Cleanup and restore DOM securely
-                const displayLogo = document.getElementById('display-logo');
-                if (displayLogo && origLogoSrc) displayLogo.src = origLogoSrc;
-                
+                document.body.style.cursor = originalCursor;
+                if ($('display-logo') && originalLogoSrc) $('display-logo').src = originalLogoSrc;
+
                 const hiddenList = container.querySelector('#snag-list-hidden') || container.querySelector('#snag-list');
                 if (hiddenList) {
-                    hiddenList.id = 'snag-list'; // Restore original ID
-                    hiddenList.style.removeProperty('display'); 
+                    hiddenList.id = 'snag-list';
+                    hiddenList.style.removeProperty('display');
                 }
-                
+
                 const headerBlock = container.querySelector('.rpt-hdr-block');
                 const dashboard = container.querySelector('.dash-wrap');
                 const sectionLabel = container.querySelector('.sec-lbl');
-                if(headerBlock) headerBlock.style.display = '';
-                if(dashboard) dashboard.style.display = '';
-                if(sectionLabel) sectionLabel.style.display = '';
+                if (headerBlock) headerBlock.style.display = '';
+                if (dashboard) dashboard.style.display = '';
+                if (sectionLabel) sectionLabel.style.display = '';
+
                 container.classList.remove('pdf-export-mode');
-                document.querySelectorAll('.no-print').forEach(el=>el.style.display='');
+                previousDisplays.forEach((display, el) => { el.style.display = display; });
             }
         }
 
-        /* ── EXCEL ── */
-        async function exportExcel(){
-            const ti=document.getElementById('report-title');if(!ti.value.trim()){const t=prompt("Enter report title:","");if(t===null)return;ti.value=t.trim();updateReportHeader();}
-            const title=ti.value || 'SNAG REPORT';
-            const projName=document.getElementById('proj-name').value||'N/A',rawDate=document.getElementById('proj-date').value,projManager=document.getElementById('proj-manager').value||'N/A',prefix=document.getElementById('report-prefix').value||'ADCOOP-SN';
-            
-            let projDate = 'N/A';
-            if (rawDate) {
-                const p = rawDate.split('-');
-                if (p.length === 3) projDate = `${p[2]}/${p[1]}/${p[0]}`;
+        async function exportExcel() {
+            const titleInput = $('report-title');
+            if (!titleInput.value.trim()) {
+                const title = prompt("Enter report title:", "");
+                if (title === null) return;
+                titleInput.value = title.trim();
+                updateReportHeader();
             }
 
-            const wb=new ExcelJS.Workbook();
-            const safeTabName = title.replace(/[\\\/*\?\[\]]/g, '').substring(0, 31) || 'Observations';
-            const ws=wb.addWorksheet(safeTabName);
-            ws.addRow([title.toUpperCase()]);
-            ws.addRow(["Project:",projName]);
-            ws.addRow(["Manager:",projManager]);
-            ws.addRow(["Date:",projDate]);
-            ws.addRow([]);
-            ws.addRow(["Summary",`Total Observations: ${snagData.length}`]);
-            ws.addRow([]);
+            const title = titleInput.value || 'SNAG REPORT';
+            const projectName = $('proj-name').value || 'N/A';
+            const projectDate = formatDateForDisplay($('proj-date').value) || 'N/A';
+            const projectManager = $('proj-manager').value || 'N/A';
+            const prefix = $('report-prefix').value || 'ADCOOP-SN';
 
-            // Embed logo in top right if possible
+            const workbook = new ExcelJS.Workbook();
+            const safeTabName = title.replace(/[\\/*?\[\]]/g, '').substring(0, 31) || 'Observations';
+            const worksheet = workbook.addWorksheet(safeTabName);
+
+            worksheet.addRow([title.toUpperCase()]);
+            worksheet.addRow(["Project:", projectName]);
+            worksheet.addRow(["Manager:", projectManager]);
+            worksheet.addRow(["Date:", projectDate]);
+            worksheet.addRow([]);
+            worksheet.addRow(["Summary", `Total Observations: ${snagData.length}`]);
+            worksheet.addRow([]);
+
             const logoBase64DataUrl = await getLogoBase64();
             if (logoBase64DataUrl) {
                 try {
-                    const b64 = logoBase64DataUrl.split(',')[1];
-                    const ext = logoBase64DataUrl.includes('png') ? 'png' : 'jpeg';
-                    const imgId = wb.addImage({ base64: b64, extension: ext });
-                    ws.addImage(imgId, {
-                        tl: { col: 2.1, row: 0.2 }, // Top right (Column C)
+                    const base64 = logoBase64DataUrl.split(',')[1];
+                    const extension = logoBase64DataUrl.includes('png') ? 'png' : 'jpeg';
+                    const imageId = workbook.addImage({ base64, extension });
+                    worksheet.addImage(imageId, {
+                        tl: { col: 2.1, row: 0.2 },
                         ext: { width: 140, height: 50 }
                     });
-                } catch(e) {}
+                } catch (e) {}
             }
-            const hr=ws.addRow(["Ref ID","Photo","Description"]);hr.font={bold:true};ws.columns=[{width:15},{width:25},{width:70}];
-            const ft=document.getElementById('filter-text').value.toLowerCase();let row=9;
-            snagData.forEach(s=>{
-                if(ft&&!(s.comment||'').toLowerCase().includes(ft))return;
-                const ref=`${prefix}-${String(s.id).padStart(3,'0')}`;
-                const r=ws.addRow([ref,"",s.comment||'']);r.height=150;r.alignment={vertical:'middle',wrapText:true};
-                if(s.image){const b64=s.image.split(',')[1],ext=s.image.includes("png")?"png":"jpeg",imgId=wb.addImage({base64:b64,extension:ext});ws.addImage(imgId,{tl:{col:1.1,row:row-1+0.1},ext:{width:210,height:150}});}
-                row++;
+
+            const headerRow = worksheet.addRow(["Ref ID", "Photo", "Description"]);
+            headerRow.font = { bold: true };
+            worksheet.columns = [{ width: 15 }, { width: 25 }, { width: 70 }];
+
+            const filterText = $('filter-text').value.toLowerCase();
+            let rowNumber = 9;
+
+            snagData.forEach((snag) => {
+                if (filterText && !(snag.comment || '').toLowerCase().includes(filterText)) return;
+                const ref = `${prefix}-${String(snag.id).padStart(3, '0')}`;
+                const row = worksheet.addRow([ref, "", snag.comment || '']);
+                row.height = 150;
+                row.alignment = { vertical: 'middle', wrapText: true };
+
+                if (snag.image) {
+                    const base64 = snag.image.split(',')[1];
+                    const extension = snag.image.includes("png") ? "png" : "jpeg";
+                    const imageId = workbook.addImage({ base64, extension });
+                    worksheet.addImage(imageId, {
+                        tl: { col: 1.1, row: rowNumber - 1 + 0.1 },
+                        ext: { width: 210, height: 150 }
+                    });
+                }
+                rowNumber++;
             });
-            const buf=await wb.xlsx.writeBuffer();
-            const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blobUrl = URL.createObjectURL(new Blob([buffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            }));
+            const anchor = document.createElement('a');
             const safeFileName = title.replace(/[^a-z0-9]/gi, '_') || 'Project_Snags';
-            a.download= safeFileName + ".xlsx";
-            document.body.appendChild(a);a.click();a.remove();
+            anchor.href = blobUrl;
+            anchor.download = safeFileName + ".xlsx";
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
         }
 
-        /* ── AUTO-SAVE ── */
-        function autoSave(){if(!hasUnsavedChanges&&snagData.length===0)return;const d={reportTitle:document.getElementById('report-title').value,projName:document.getElementById('proj-name').value,projDate:document.getElementById('proj-date').value,projManager:document.getElementById('proj-manager').value,reportPrefix:document.getElementById('report-prefix').value,reportLogo:document.getElementById('report-logo').value,snags:snagData,counter:snagCounter};localStorage.setItem("snagProject",JSON.stringify(d));hasUnsavedChanges=false;}
-        setInterval(autoSave,5000);
+        function autoSave() {
+            if (!hasUnsavedChanges && snagData.length === 0) return;
+            localStorage.setItem("snagProject", JSON.stringify(collectProjectData()));
+            hasUnsavedChanges = false;
+        }
 
-        /* ── INIT ── */
-        window.onload=function(){
-            applyTheme(localStorage.getItem('snagTheme')||'light');
-            const saved=localStorage.getItem("snagProject");
-            if(saved){
-                if(confirm("Found an unsaved session. Restore it?")){
-                    const d=JSON.parse(saved);
-                    ['report-title','proj-name','proj-date','proj-manager','report-prefix','report-logo'].forEach((id,i)=>{document.getElementById(id).value=[d.reportTitle,d.projName,d.projDate,d.projManager,d.reportPrefix||'ADCOOP-SN',d.reportLogo||'https://logo.clearbit.com/adcoop.com'][i]||'';});
-                    snagData=d.snags||[];snagCounter=d.counter||1;renderSnags();updateReportHeader();
-                }else{localStorage.removeItem("snagProject");updateReportHeader();}
-            }else{updateReportHeader();}
+        setInterval(autoSave, 5000);
+
+        window.onload = function() {
+            applyTheme(localStorage.getItem('snagTheme') || 'light');
+            const saved = localStorage.getItem("snagProject");
+
+            if (saved) {
+                if (confirm("Found an unsaved session. Restore it?")) {
+                    try {
+                        restoreProjectData(JSON.parse(saved));
+                    } catch (e) {
+                        localStorage.removeItem("snagProject");
+                        updateReportHeader(false);
+                    }
+                } else {
+                    localStorage.removeItem("snagProject");
+                    updateReportHeader(false);
+                    renderSnags();
+                }
+            } else {
+                updateReportHeader(false);
+                renderSnags();
+            }
+
+            hasUnsavedChanges = false;
         };
-        if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>
