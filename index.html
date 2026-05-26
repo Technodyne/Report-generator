@@ -432,7 +432,7 @@
         .rpt-meta-row { display:flex; justify-content:space-between; align-items:center; gap:18px; }
         .rpt-meta-text { font-size:.88em; color:var(--text-sec); line-height:1.8; }
         .rpt-meta-text strong { color:var(--text-pri); }
-        .rpt-logo img { max-height:46px; max-width:145px; object-fit:contain; }
+        .rpt-logo img { max-height:58px; max-width:180px; object-fit:contain; }
         .divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:13px 0; }
         .sec-lbl {
             font-family:var(--mono);
@@ -489,7 +489,7 @@
         .pdf-export-mode .rpt-title { color:#1a1208 !important; font-size:15px !important; margin-bottom:10px !important; }
         .pdf-export-mode .rpt-meta-text { color:#3a2e1a !important; font-size:11px !important; line-height:1.7 !important; }
         .pdf-export-mode .rpt-meta-text strong { color:#1a1208 !important; }
-        .pdf-export-mode .rpt-logo img { max-height:42px !important; filter:none !important; }
+        .pdf-export-mode .rpt-logo img { max-height:52px !important; filter:none !important; }
         .pdf-export-mode .divider { background:#c8baa0 !important; margin:10px 0 !important; }
         .pdf-export-mode .dash-wrap { display:block !important; width:220px !important; margin-bottom:16px !important; }
         .pdf-export-mode .dash-card { background:#f0ebe0 !important; border:1px solid #c8baa0 !important; border-radius:4px !important; padding:10px 14px !important; }
@@ -689,7 +689,7 @@
 
     <script>
         const HARDCODED_COMPANY_LOGO_URL = "./logo.png";
-        const IMAGE_MAX = 1600;
+        const IMAGE_MAX = 2000;
         const JPEG_QUALITY = 0.82;
         const UNDO_LIMIT = 8;
 
@@ -1249,7 +1249,7 @@
                     container.appendChild(pageSnagsContainer);
 
                     const renderedCanvas = await html2canvas(container, {
-                        scale: 2,
+                        scale: 3,
                         useCORS: true,
                         backgroundColor: '#ffffff',
                         width: 760,
@@ -1280,7 +1280,7 @@
                         if (logoBase64) {
                             try {
                                 const props = pdf.getImageProperties(logoBase64);
-                                const logoHeight = 22;
+                                const logoHeight = 28;
                                 const logoWidth = (props.width * logoHeight) / props.height;
                                 const imageType = logoBase64.includes('png') ? 'PNG' : 'JPEG';
                                 pdf.addImage(logoBase64, imageType, pdfWidth - marginX - logoWidth, 20, logoWidth, logoHeight);
@@ -1357,7 +1357,7 @@
                     const imageId = workbook.addImage({ base64, extension });
                     worksheet.addImage(imageId, {
                         tl: { col: 2.1, row: 0.2 },
-                        ext: { width: 140, height: 50 }
+                        ext: { width: 170, height: 60 }
                     });
                 } catch (e) {}
             }
