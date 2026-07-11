@@ -384,6 +384,7 @@
             transition:all .2s;
         }
         .desc-actions button:active { transform:scale(.92); border-color:var(--accent); }
+        .desc-actions button svg { display:block; }
         .btn-mic {
             position:absolute;
             right:10px;
@@ -391,10 +392,9 @@
             width:42px;
             height:42px;
             border-radius:50%;
-            border:1px solid var(--border-hi);
-            background:var(--bg-card);
-            color:var(--accent);
-            font-size:1.15em;
+            border:none;
+            background:var(--accent);
+            color:#fff;
             cursor:pointer;
             display:flex;
             align-items:center;
@@ -403,10 +403,11 @@
             transition:all .2s;
             box-shadow:var(--shadow);
         }
-        .btn-mic:hover { border-color:var(--accent); background:var(--accent-glow); }
+        .btn-mic svg { display:block; }
+        .btn-mic:hover { filter:brightness(1.12); }
+        .btn-mic:active { transform:scale(.92); }
         .btn-mic.listening {
             background:var(--danger);
-            border-color:var(--danger);
             color:#fff;
             animation:micPulse 1.2s infinite;
         }
@@ -731,10 +732,14 @@
                 <div class="fg desc-wrap">
                     <textarea id="snag-comment" placeholder="Describe the defect and required corrective action... (tap the mic to dictate)"></textarea>
                     <div class="desc-actions" id="desc-actions">
-                        <button type="button" onclick="$('snag-photo-cam').click()" title="Take photo" aria-label="Take photo">📸</button>
-                        <button type="button" onclick="$('snag-photo-gal').click()" title="Choose from gallery" aria-label="Choose from gallery">🖼️</button>
+                        <button type="button" onclick="$('snag-photo-cam').click()" title="Take photo" aria-label="Take photo">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h1a2 2 0 0 0 2-2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2"/><circle cx="12" cy="13" r="3"/></svg>
+                        </button>
+                        <button type="button" onclick="$('snag-photo-gal').click()" title="Attach from gallery" aria-label="Attach from gallery">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7l-6.5 6.5a1.5 1.5 0 0 0 3 3L18 10a3 3 0 0 0-6-6l-6.5 6.5a4.5 4.5 0 0 0 9 9L21 13"/></svg>
+                        </button>
                     </div>
-                    <button type="button" class="btn-mic" id="btn-mic" onclick="toggleDictation()" title="Dictate description" aria-label="Dictate description">🎤</button>
+                    <button type="button" class="btn-mic" id="btn-mic" onclick="toggleDictation()" title="Dictate description" aria-label="Dictate description"></button>
                 </div>
                 <button class="btn btn-gold btn-full" id="btn-add-snag" onclick="addSnag()">+ Add Observation</button>
             </div>
@@ -878,11 +883,14 @@
         let isListening = false;
         let micStoppedByUser = false;
 
+        const MIC_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>';
+        const STOP_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
+
         function setMicState(listening) {
             isListening = listening;
             const micBtn = $('btn-mic');
             micBtn.classList.toggle('listening', listening);
-            micBtn.textContent = listening ? '⏹' : '🎤';
+            micBtn.innerHTML = listening ? STOP_SVG : MIC_SVG;
             micBtn.title = listening ? 'Stop dictation' : 'Dictate description';
         }
 
@@ -1585,6 +1593,7 @@
 
         window.onload = function() {
             applyTheme(localStorage.getItem('snagTheme') || 'light');
+            $('btn-mic').innerHTML = MIC_SVG;
             if (localStorage.getItem('configCollapsed') === '1') {
                 $('config-panel').classList.add('collapsed');
             }
